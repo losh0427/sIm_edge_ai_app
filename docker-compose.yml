@@ -1,0 +1,37 @@
+version: "3.8"
+
+services:
+  server:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    ports:
+      - "8501:8501"   # Streamlit UI
+      - "50051:50051" # gRPC
+    volumes:
+      - ./models:/app/models:ro
+    networks:
+      - edge-net
+
+  device:
+    build:
+      context: .
+      dockerfile: device/Dockerfile
+    environment:
+      - SERVER_ADDR=server:50051
+      - EDGE_ID=edge-1
+      - MODEL_PATH=/app/models/ssd_mobilenet_v2.tflite
+      - LABELS_PATH=/app/models/coco_labels.txt
+      - INPUT_DIR=/app/data/test_frames
+      - CONF_THRESH=0.4
+    volumes:
+      - ./models:/app/models:ro
+      - ./data:/app/data:ro
+    depends_on:
+      - server
+    networks:
+      - edge-net
+
+networks:
+  edge-net:
+    driver: bridge

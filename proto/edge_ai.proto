@@ -1,0 +1,44 @@
+syntax = "proto3";
+package edgeai;
+
+message BoundingBox {
+    float x_min     = 1;
+    float y_min     = 2;
+    float x_max     = 3;
+    float y_max     = 4;
+    int32 class_id  = 5;
+    string label    = 6;
+    float confidence = 7;
+}
+
+message DetectionFrame {
+    string edge_id              = 1;
+    int64  timestamp_ms         = 2;
+    repeated BoundingBox boxes  = 3;
+    bytes  thumbnail_jpeg       = 4;
+    float  inference_latency_ms = 5;
+    int32  frame_number         = 6;
+    string hal_backend          = 7;
+    int32  original_width       = 8;
+    int32  original_height      = 9;
+}
+
+message EdgeStats {
+    string edge_id           = 1;
+    float  avg_latency_ms    = 2;
+    float  p99_latency_ms    = 3;
+    float  fps               = 4;
+    int32  inference_count   = 5;
+    int32  error_count       = 6;
+    map<string, int32> class_distribution = 7;
+}
+
+message ServerResponse {
+    bool   ok              = 1;
+    int32  model_version   = 2;
+}
+
+service EdgeService {
+    rpc ReportDetection (DetectionFrame) returns (ServerResponse);
+    rpc ReportStats     (EdgeStats)      returns (ServerResponse);
+}
