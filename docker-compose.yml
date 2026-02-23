@@ -8,6 +8,8 @@ services:
     ports:
       - "8501:8501"   # Streamlit UI
       - "50051:50051" # gRPC
+    environment:
+      - PYTHONUNBUFFERED=1
     volumes:
       - ./models:/app/models:ro
     networks:
@@ -17,6 +19,8 @@ services:
     build:
       context: .
       dockerfile: device/Dockerfile
+      args:
+        - HAL_CAMERA_BACKEND=${HAL_CAMERA_BACKEND:-FILE}
     environment:
       - SERVER_ADDR=server:50051
       - EDGE_ID=edge-1
@@ -24,9 +28,9 @@ services:
       - LABELS_PATH=/app/models/coco_labels.txt
       - INPUT_DIR=/app/data/test_frames
       - CONF_THRESH=0.4
-    volumes:
-      - ./models:/app/models:ro
-      - ./data:/app/data:ro
+      - CAM_INDEX=${CAM_INDEX:-0}
+    devices:
+      - "/dev/video0:/dev/video0"
     depends_on:
       - server
     networks:

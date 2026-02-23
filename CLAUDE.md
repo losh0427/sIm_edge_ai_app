@@ -85,6 +85,8 @@ python -m grpc_tools.protoc -I proto --python_out=server --grpc_python_out=serve
 | `LABELS_PATH` | `/app/models/coco_labels.txt` | COCO labels file |
 | `INPUT_DIR` | `/app/data/test_frames` | Directory of input JPEG frames |
 | `CONF_THRESH` | `0.4` | Detection confidence threshold |
+| `CAM_INDEX` | `0` | Camera device index for OPENCV backend (`/dev/videoN`) |
+| `HAL_CAMERA_BACKEND` | `FILE` | Compile-time HAL switch: `FILE` or `OPENCV` |
 
 ## Current Status
 - All source files written, not yet tested end-to-end
@@ -98,7 +100,7 @@ python -m grpc_tools.protoc -I proto --python_out=server --grpc_python_out=serve
 3. Get device Docker build passing (TFLite + gRPC linking)
 4. End-to-end: device → server → see detections in Streamlit
 5. Multi-threaded pipeline (3 pthreads + RingBuffer with shm+semaphore)
-6. Webcam support (V4L2FrameSource / OpenCVFrameSource)
+6. ✅ Webcam support (OpenCVFrameSource + compile-time HAL switching)
 7. Two-machine deployment (device on laptop B, server on laptop A)
 8. Kernel module (ml_stats.ko), bpftrace, QEMU ARM64 (bonus items)
 9. Prometheus + Grafana (replaces/supplements Streamlit metrics)

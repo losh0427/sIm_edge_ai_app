@@ -1,4 +1,9 @@
+#if defined(HAL_USE_OPENCV)
+#include "hal/opencv_frame_source.h"
+#elif defined(HAL_USE_FILE)
 #include "hal/file_frame_source.h"
+#endif
+
 #include "src/preprocess.h"
 #include "src/inference.h"
 #include "src/postprocess.h"
@@ -10,6 +15,7 @@
 #include <string>
 #include <thread>
 #include <csignal>
+#include <memory>
 
 static volatile bool running = true;
 void sig_handler(int) { running = false; }
@@ -19,7 +25,6 @@ int main(int argc, char** argv) {
     signal(SIGTERM, sig_handler);
 
     // Config from env
-    std::string input_dir   = getenv("INPUT_DIR")   ? getenv("INPUT_DIR")   : "/app/data/test_frames";
     std::string model_path  = getenv("MODEL_PATH")  ? getenv("MODEL_PATH")  : "/app/models/ssd_mobilenet_v2.tflite";
     std::string labels_path = getenv("LABELS_PATH") ? getenv("LABELS_PATH") : "/app/models/coco_labels.txt";
     std::string server_addr = getenv("SERVER_ADDR") ? getenv("SERVER_ADDR") : "server:50051";
@@ -30,12 +35,21 @@ int main(int argc, char** argv) {
     fprintf(stderr, "Loaded %zu labels\n", labels.size());
 
     // Init HAL
-    FileFrameSource source(input_dir, 640, 480);
-    if (!source.open()) {
-        fprintf(stderr, "Failed to open frame source: %s\n", input_dir.c_str());
+    std::unique_ptr<IFrameSource> source;
+
+#if defined(HAL_USE_OPENCV)
+    int cam_index = getenv("CAM_INDEX") ? atoi(getenv("CAM_INDEX")) : 0;
+    source = std::make_unique<OpenCVFrameSource>(cam_index, 640, 480);
+#elif defined(HAL_USE_FILE)
+    std::string input_dir = getenv("INPUT_DIR") ? getenv("INPUT_DIR") : "/app/data/test_frames";
+    source = std::make_unique<FileFrameSource>(input_dir, 640, 480);
+#endif
+
+    if (!source->open()) {
+        fprintf(stderr, "Failed to open frame source\n");
         return 1;
     }
-    fprintf(stderr, "Frame source: %s\n", source.describe().c_str());
+    fprintf(stderr, "Frame source: %s\n", source->describe().c_str());
 
     // Init inference
     Inference infer;
@@ -50,7 +64,7 @@ int main(int argc, char** argv) {
 
     while (running) {
         Frame frame;
-        if (!source.next_frame(frame)) {
+        if (!source->next_frame(frame)) {
             fprintf(stderr, "No more frames\n");
             break;
         }
@@ -72,14 +86,6 @@ int main(int argc, char** argv) {
         // Thumbnail
         auto thumbnail = preprocess::encode_thumbnail(frame);
 
-        // Assign labels
-        for (auto& d : filtered) {
-            // SSD class_id is 0-indexed, but some models are 1-indexed
-            int idx = d.class_id;
-            if (idx >= 0 && idx < (int)labels.size())
-                ; // label available
-        }
-
         // Print
         frame_num++;
         auto elapsed = std::chrono::duration<float>(std::chrono::steady_clock::now() - start_time).count();
@@ -96,13 +102,15 @@ int main(int argc, char** argv) {
 
         // Send via gRPC
         grpc.send_detection(edge_id, filtered, thumbnail, latency_ms,
-                           frame_num, source.describe(), frame.width, frame.height);
+                           frame_num, source->describe(), frame.width, frame.height);
 
+#if defined(HAL_USE_FILE)
         // Throttle to ~15 FPS for file source
         std::this_thread::sleep_for(std::chrono::milliseconds(66));
+#endif
     }
 
-    source.close();
+    source->close();
     fprintf(stderr, "\nDone. %d frames processed.\n", frame_num);
     return 0;
 }

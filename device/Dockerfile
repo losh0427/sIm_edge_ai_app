@@ -25,13 +25,15 @@ COPY device/ /app/device/
 
 # Build edge agent
 WORKDIR /app/device/build
-RUN cmake -DTFLITE_SOURCE_DIR=/tf -DCMAKE_BUILD_TYPE=Release .. && \
+ARG HAL_CAMERA_BACKEND=FILE
+RUN cmake -DTFLITE_SOURCE_DIR=/tf -DCMAKE_BUILD_TYPE=Release \
+          -DHAL_CAMERA_BACKEND=${HAL_CAMERA_BACKEND} .. && \
     cmake --build . -j$(nproc)
 
 # Runtime stage
 FROM ubuntu:22.04
 RUN apt-get update && apt-get install -y \
-    libopencv-core4.5d libopencv-imgproc4.5d libopencv-imgcodecs4.5d \
+    libopencv-core4.5d libopencv-imgproc4.5d libopencv-imgcodecs4.5d libopencv-videoio4.5d \
     libgrpc++1 libprotobuf23 \
     && rm -rf /var/lib/apt/lists/*
 

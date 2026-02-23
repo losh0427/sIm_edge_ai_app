@@ -4,6 +4,21 @@ project(edge_agent CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# === HAL Camera Backend ===
+set(HAL_CAMERA_BACKEND "FILE" CACHE STRING "Camera HAL backend: FILE or OPENCV")
+set_property(CACHE HAL_CAMERA_BACKEND PROPERTY STRINGS FILE OPENCV)
+
+if(HAL_CAMERA_BACKEND STREQUAL "OPENCV")
+    set(HAL_SOURCE hal/opencv_frame_source.cpp)
+    add_compile_definitions(HAL_USE_OPENCV)
+elseif(HAL_CAMERA_BACKEND STREQUAL "FILE")
+    set(HAL_SOURCE hal/file_frame_source.cpp)
+    add_compile_definitions(HAL_USE_FILE)
+else()
+    message(FATAL_ERROR "Unknown HAL_CAMERA_BACKEND: ${HAL_CAMERA_BACKEND} (expected FILE or OPENCV)")
+endif()
+message(STATUS "HAL Camera Backend: ${HAL_CAMERA_BACKEND}")
+
 # === TFLite (from source) ===
 set(TFLITE_SOURCE_DIR "/tf" CACHE PATH "TensorFlow source directory")
 if(NOT EXISTS "${TFLITE_SOURCE_DIR}/tensorflow/lite/CMakeLists.txt")
@@ -16,7 +31,11 @@ add_subdirectory(
 )
 
 # === OpenCV ===
-find_package(OpenCV REQUIRED COMPONENTS core imgproc imgcodecs)
+set(OPENCV_COMPONENTS core imgproc imgcodecs)
+if(HAL_CAMERA_BACKEND STREQUAL "OPENCV")
+    list(APPEND OPENCV_COMPONENTS videoio)
+endif()
+find_package(OpenCV REQUIRED COMPONENTS ${OPENCV_COMPONENTS})
 
 # === gRPC + Protobuf ===
 find_package(PkgConfig REQUIRED)
@@ -58,7 +77,7 @@ add_executable(edge_agent
     src/inference.cpp
     src/postprocess.cpp
     src/grpc_client.cpp
-    hal/file_frame_source.cpp
+    ${HAL_SOURCE}
     ${PROTO_GEN_DIR}/edge_ai.pb.cc
     ${PROTO_GEN_DIR}/edge_ai.grpc.pb.cc
 )
