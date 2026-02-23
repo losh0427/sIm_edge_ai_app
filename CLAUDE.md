@@ -21,7 +21,8 @@ Portfolio project targeting Google Taiwan new grad SWE (Home/Nest/ChromeOS/Cloud
 - HAL pattern: `IFrameSource` interface. Currently `FileFrameSource` (reads JPEGs). Future: `V4L2FrameSource`, `OpenCVFrameSource`, `ShmFrameSource`
 - Compile-time HAL switching via CMake flag: `cmake -DHAL_CAMERA_BACKEND=FILE|V4L2|OPENCV|SHM ..`
 - Hand-written NMS (`compute_iou` + `nms_filter`) — not using any framework's built-in postprocess
-- Single-threaded MVP first, multi-threaded (recv/infer/upload pthreads + RingBuffer with shm+semaphore) comes later
+- 3-thread pipeline: recv → RingBuffer A → infer → RingBuffer B → upload (POSIX semaphores + pthread_mutex, SPSC, 4 slots each, ~8.4 MB total)
+- Zero malloc in steady state for recv/infer threads; upload thread has small JPEG encode + protobuf allocs (I/O-bound, acceptable)
 - TFLite C++ API (not C API), model is SSD MobileNet v2 INT8, input 300x300 uint8
 - `state.py` `Store` is the single shared object between the gRPC thread and Streamlit's polling loop; all access is mutex-guarded
 - Proto stubs for Python are generated at Docker image build time (not committed to git); the server Dockerfile runs `grpc_tools.protoc` to emit `edge_ai_pb2.py` and `edge_ai_pb2_grpc.py` into `/app/server/`
@@ -39,7 +40,7 @@ device/
   CMakeLists.txt             # TFLite from /tf source dir, gRPC via pkg-config
   Dockerfile                 # Multi-stage: builder (compile TFLite ~15min) → runtime
   hal/                       # IFrameSource interface + FileFrameSource
-  src/                       # main.cpp, preprocess, inference, postprocess(NMS), grpc_client, labels
+  src/                       # main.cpp, pipeline, ring_buffer, preprocess, inference, postprocess(NMS), grpc_client, labels
 server/
   Dockerfile                 # Generates proto Python stubs at build time
   app/main.py                # Streamlit UI + gRPC server startup (starts gRPC in background thread)
@@ -99,7 +100,7 @@ python -m grpc_tools.protoc -I proto --python_out=server --grpc_python_out=serve
 2. Get server running and verified with test_grpc_client.py
 3. Get device Docker build passing (TFLite + gRPC linking)
 4. End-to-end: device → server → see detections in Streamlit
-5. Multi-threaded pipeline (3 pthreads + RingBuffer with shm+semaphore)
+5. ✅ Multi-threaded pipeline (3 pthreads + RingBuffer with POSIX semaphores)
 6. ✅ Webcam support (OpenCVFrameSource + compile-time HAL switching)
 7. Two-machine deployment (device on laptop B, server on laptop A)
 8. Kernel module (ml_stats.ko), bpftrace, QEMU ARM64 (bonus items)

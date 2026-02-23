@@ -77,6 +77,7 @@ add_executable(edge_agent
     src/inference.cpp
     src/postprocess.cpp
     src/grpc_client.cpp
+    src/pipeline.cpp
     ${HAL_SOURCE}
     ${PROTO_GEN_DIR}/edge_ai.pb.cc
     ${PROTO_GEN_DIR}/edge_ai.grpc.pb.cc
@@ -94,4 +95,5 @@ target_link_libraries(edge_agent PRIVATE
     ${OpenCV_LIBS}
     ${PROTOBUF_LIBRARIES}
     ${GRPC_LIBRARIES}
+    pthread
 )

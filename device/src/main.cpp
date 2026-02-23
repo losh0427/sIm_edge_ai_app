@@ -4,21 +4,21 @@
 #include "hal/file_frame_source.h"
 #endif
 
-#include "src/preprocess.h"
 #include "src/inference.h"
-#include "src/postprocess.h"
 #include "src/grpc_client.h"
 #include "src/labels.h"
+#include "src/pipeline.h"
 #include <cstdio>
 #include <cstdlib>
-#include <chrono>
 #include <string>
-#include <thread>
 #include <csignal>
 #include <memory>
 
-static volatile bool running = true;
-void sig_handler(int) { running = false; }
+static Pipeline* g_pipeline = nullptr;
+
+void sig_handler(int) {
+    if (g_pipeline) g_pipeline->request_shutdown();
+}
 
 int main(int argc, char** argv) {
     signal(SIGINT, sig_handler);
@@ -59,58 +59,27 @@ int main(int argc, char** argv) {
     GrpcClient grpc;
     grpc.connect(server_addr);
 
-    int frame_num = 0;
-    auto start_time = std::chrono::steady_clock::now();
+    // Build pipeline config and run
+    PipelineConfig config;
+    config.source         = source.get();
+    config.inference      = &infer;
+    config.grpc           = &grpc;
+    config.edge_id        = edge_id;
+    config.hal_desc       = source->describe();
+    config.conf_threshold = conf_threshold;
+    config.labels         = labels;
 
-    while (running) {
-        Frame frame;
-        if (!source->next_frame(frame)) {
-            fprintf(stderr, "No more frames\n");
-            break;
-        }
+    Pipeline pipeline;
+    g_pipeline = &pipeline;
 
-        // Preprocess: resize to model input
-        auto input = preprocess::resize(frame, infer.input_width(), infer.input_height());
-
-        // Inference
-        auto t0 = std::chrono::steady_clock::now();
-        auto detections = infer.run(input.data(), input.size());
-        auto t1 = std::chrono::steady_clock::now();
-        float latency_ms = std::chrono::duration<float, std::milli>(t1 - t0).count();
-
-        // Filter by confidence
-        std::vector<Detection> filtered;
-        for (auto& d : detections)
-            if (d.confidence >= conf_threshold) filtered.push_back(d);
-
-        // Thumbnail
-        auto thumbnail = preprocess::encode_thumbnail(frame);
-
-        // Print
-        frame_num++;
-        auto elapsed = std::chrono::duration<float>(std::chrono::steady_clock::now() - start_time).count();
-        float fps = frame_num / elapsed;
-        fprintf(stderr, "\rFrame %d | %.1f FPS | %.1f ms | %zu detections   ",
-                frame_num, fps, latency_ms, filtered.size());
-
-        for (auto& d : filtered) {
-            std::string lbl = (d.class_id >= 0 && d.class_id < (int)labels.size())
-                              ? labels[d.class_id] : "???";
-            fprintf(stderr, "\n  [%s] %.2f (%.3f,%.3f)-(%.3f,%.3f)",
-                    lbl.c_str(), d.confidence, d.x_min, d.y_min, d.x_max, d.y_max);
-        }
-
-        // Send via gRPC
-        grpc.send_detection(edge_id, filtered, thumbnail, latency_ms,
-                           frame_num, source->describe(), frame.width, frame.height);
-
-#if defined(HAL_USE_FILE)
-        // Throttle to ~15 FPS for file source
-        std::this_thread::sleep_for(std::chrono::milliseconds(66));
-#endif
+    if (pipeline.start(config) != 0) {
+        fprintf(stderr, "Failed to start pipeline\n");
+        return 1;
     }
 
+    pipeline.stop();
     source->close();
-    fprintf(stderr, "\nDone. %d frames processed.\n", frame_num);
+    g_pipeline = nullptr;
+    fprintf(stderr, "\nDone.\n");
     return 0;
 }
