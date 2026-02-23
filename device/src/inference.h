@@ -12,6 +12,7 @@ struct Detection {
 
 class Inference {
 public:
+    ~Inference();
     bool load_model(const std::string& model_path, int num_threads = 4);
     // input: uint8 RGB pixels, size must be input_w * input_h * 3
     std::vector<Detection> run(const uint8_t* input_data, int input_size);
@@ -20,6 +21,6 @@ public:
 
 private:
     struct Impl;
-    std::unique_ptr<Impl> impl_;
+    Impl* impl_ = nullptr;
     int input_w_ = 0, input_h_ = 0;
 };

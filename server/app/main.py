@@ -11,13 +11,8 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.state import store
-from app.grpc_server import start_grpc_server
 
-# Start gRPC server once
-if "grpc_started" not in st.session_state:
-    start_grpc_server(port=50051)
-    st.session_state.grpc_started = True
-
+# gRPC server is started by entrypoint.py before Streamlit launches
 st.set_page_config(page_title="Edge AI Runtime", layout="wide")
 st.title("🎯 Edge AI Runtime — Detection Dashboard")
 
@@ -75,7 +70,7 @@ while True:
                     if result.thumbnail_jpeg:
                         img = draw_boxes(result.thumbnail_jpeg, result.boxes,
                                         result.orig_width, result.orig_height)
-                        st.image(img, caption=f"Frame #{result.frame_number}", use_container_width=True)
+                        st.image(img, caption=f"Frame #{result.frame_number}", use_column_width=True)
 
                     # Stats
                     c1, c2, c3 = st.columns(3)

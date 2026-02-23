@@ -9,8 +9,10 @@ struct Inference::Impl {
     std::unique_ptr<tflite::Interpreter> interpreter;
 };
 
+Inference::~Inference() { delete impl_; }
+
 bool Inference::load_model(const std::string& model_path, int num_threads) {
-    impl_ = std::make_unique<Impl>();
+    impl_ = new Impl();
     impl_->model = tflite::FlatBufferModel::BuildFromFile(model_path.c_str());
     if (!impl_->model) {
         fprintf(stderr, "Failed to load model: %s\n", model_path.c_str());

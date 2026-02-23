@@ -6,6 +6,7 @@
 
 class GrpcClient {
 public:
+    ~GrpcClient();
     bool connect(const std::string& server_addr);
     bool send_detection(const std::string& edge_id,
                         const std::vector<Detection>& detections,
@@ -15,5 +16,5 @@ public:
                         int orig_w, int orig_h);
 private:
     struct Impl;
-    std::unique_ptr<Impl> impl_;
+    Impl* impl_ = nullptr;
 };

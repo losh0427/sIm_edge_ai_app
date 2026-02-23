@@ -2,14 +2,17 @@
 #include "edge_ai.grpc.pb.h"
 #include <grpcpp/grpcpp.h>
 #include <cstdio>
+#include <chrono>
 
 struct GrpcClient::Impl {
     std::shared_ptr<grpc::Channel> channel;
     std::unique_ptr<edgeai::EdgeService::Stub> stub;
 };
 
+GrpcClient::~GrpcClient() { delete impl_; }
+
 bool GrpcClient::connect(const std::string& server_addr) {
-    impl_ = std::make_unique<Impl>();
+    impl_ = new Impl();
     impl_->channel = grpc::CreateChannel(server_addr, grpc::InsecureChannelCredentials());
     impl_->stub = edgeai::EdgeService::NewStub(impl_->channel);
     fprintf(stderr, "gRPC connected to %s\n", server_addr.c_str());
