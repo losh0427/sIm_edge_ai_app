@@ -1,0 +1,25 @@
+# One-shot container to export YOLOv8n → float32 TFLite.
+# Keeps PyTorch / ultralytics (~1.5 GB) out of the host environment.
+#
+# Build (once):
+#   docker build -f tools/Dockerfile.yolov8-export -t yolov8-export .
+#
+# Run (mounts host ./models so the .tflite lands there directly):
+#   docker run --rm -v "$(pwd)/models:/workspace/models" yolov8-export
+#
+# Override input size (default 640 → 320 is faster/smaller):
+#   docker run --rm -v "$(pwd)/models:/workspace/models" yolov8-export --imgsz 320
+#
+# Output: models/yolov8n_float32.tflite  (on host)
+
+FROM python:3.11-slim
+
+RUN pip install --no-cache-dir ultralytics
+
+WORKDIR /workspace
+
+COPY models/export_yolov8n.py export_yolov8n.py
+
+# export_yolov8n.py writes to models/yolov8n_float32.tflite relative to CWD;
+# host ./models is mounted at /workspace/models so the file lands on the host.
+ENTRYPOINT ["python", "export_yolov8n.py"]

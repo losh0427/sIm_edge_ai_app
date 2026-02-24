@@ -1,0 +1,28 @@
+# Dev environment for local scripts (gen_test_frames, test_grpc_client, export_yolov8n, proto codegen)
+# Setup:
+#   python3 -m venv .venv
+#   source .venv/bin/activate
+#   pip install -r requirements-dev.txt
+
+# Image processing & test data generation
+numpy
+opencv-python
+
+# gRPC (test client + proto codegen)
+grpcio
+grpcio-tools
+protobuf
+
+# YOLOv8n model export
+# Pipeline: PyTorch → ONNX → TF SavedModel → TFLite
+ultralytics
+tensorflow>=2.0.0,<=2.19.0
+tf_keras<=2.19.0
+onnx>=1.12.0,<2.0.0
+onnxslim>=0.1.71
+onnxruntime
+onnx2tf>=1.26.3,<1.29.0
+ai-edge-litert>=1.2.0
+sng4onnx>=1.0.1
+# onnx_graphsurgeon is on NVIDIA PyPI — install separately:
+#   pip install onnx_graphsurgeon --extra-index-url https://pypi.ngc.nvidia.com

@@ -134,10 +134,11 @@ void Pipeline::recv_loop() {
         slot->frame_number = frame_num;
 
         // Resize into pre-allocated slot buffer
+        int model_input_size = cfg.inference->input_width() * cfg.inference->input_height() * 3;
         preprocess::resize_into(frame,
                                 cfg.inference->input_width(),
                                 cfg.inference->input_height(),
-                                slot->input_data, kModelInputSize);
+                                slot->input_data, model_input_size);
 
         // Copy original frame data for thumbnail encoding later
         int copy_size = std::min((int)frame.data.size(), kOrigDataSize);
@@ -162,14 +163,16 @@ void Pipeline::infer_loop() {
         InferSlot* in_slot = impl_->ring_a.acquire_read_slot();
         if (!in_slot) break;
 
-        // Run inference
+        // Run inference (pre-filter with conf_threshold to reduce NMS workload)
+        int actual_input_size = cfg.inference->input_width() * cfg.inference->input_height() * 3;
         auto t0 = std::chrono::steady_clock::now();
-        auto raw_dets = cfg.inference->run(in_slot->input_data, kModelInputSize);
+        auto raw_dets = cfg.inference->run(in_slot->input_data, actual_input_size,
+                                           cfg.conf_threshold);
         auto t1 = std::chrono::steady_clock::now();
         float latency_ms = std::chrono::duration<float, std::milli>(t1 - t0).count();
 
         // NMS + confidence filter
-        auto filtered = postprocess::nms_filter(raw_dets, 0.5f, cfg.conf_threshold);
+        auto filtered = postprocess::nms_filter(raw_dets, cfg.iou_threshold, cfg.conf_threshold);
 
         // Acquire upload slot
         UploadSlot* out_slot = impl_->ring_b.acquire_write_slot();

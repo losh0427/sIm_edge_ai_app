@@ -2,8 +2,10 @@
 #include "inference.h"
 #include <cstdint>
 
-// Model input: 300 * 300 * 3 = 270,000 bytes
-static constexpr int kModelInputSize = 300 * 300 * 3;
+// Pre-allocated buffer must fit the largest supported model input.
+// SSD MobileNet v2: 300x300x3 = 270,000 B
+// YOLOv8n:         640x640x3 = 1,228,800 B
+static constexpr int kMaxModelInputSize = 640 * 640 * 3;
 
 // Original frame: 640 * 480 * 3 = 921,600 bytes
 static constexpr int kOrigWidth  = 640;
@@ -15,7 +17,7 @@ static constexpr int kMaxDetections = 100;
 
 // Slot passed from recv thread → infer thread (Ring A)
 struct InferSlot {
-    uint8_t input_data[kModelInputSize];  // resized model input (300x300x3)
+    uint8_t input_data[kMaxModelInputSize];  // resized model input (up to 640x640x3)
     uint8_t orig_data[kOrigDataSize];     // original frame for thumbnail later
     int     frame_number;
 };

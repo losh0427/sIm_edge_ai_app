@@ -3,7 +3,7 @@
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## What This Is
-IoT edge device simulation: C++ agent reads images → TFLite MobileNet-SSD object detection → gRPC → Python server with Streamlit UI.
+IoT edge device simulation: C++ agent reads images → TFLite object detection (SSD MobileNet v2 or YOLOv8n) → gRPC → Python server with Streamlit UI.
 Portfolio project targeting Google Taiwan new grad SWE (Home/Nest/ChromeOS/Cloud).
 
 ## Architecture (MVP V1 - Current)
@@ -20,10 +20,13 @@ Portfolio project targeting Google Taiwan new grad SWE (Home/Nest/ChromeOS/Cloud
 ## Key Design Decisions
 - HAL pattern: `IFrameSource` interface. Currently `FileFrameSource` (reads JPEGs). Future: `V4L2FrameSource`, `OpenCVFrameSource`, `ShmFrameSource`
 - Compile-time HAL switching via CMake flag: `cmake -DHAL_CAMERA_BACKEND=FILE|V4L2|OPENCV|SHM ..`
-- Hand-written NMS (`compute_iou` + `nms_filter`) — not using any framework's built-in postprocess
-- 3-thread pipeline: recv → RingBuffer A → infer → RingBuffer B → upload (POSIX semaphores + pthread_mutex, SPSC, 4 slots each, ~8.4 MB total)
+- Hand-written NMS (`compute_iou` + `nms_filter`) — not using any framework's built-in postprocess; IoU threshold controlled via `IOU_THRESH` env var
+- 3-thread pipeline: recv → RingBuffer A → infer → RingBuffer B → upload (POSIX semaphores + pthread_mutex, SPSC, 4 slots each)
 - Zero malloc in steady state for recv/infer threads; upload thread has small JPEG encode + protobuf allocs (I/O-bound, acceptable)
-- TFLite C++ API (not C API), model is SSD MobileNet v2 INT8, input 300x300 uint8
+- TFLite C++ API (not C API); auto-detects model type at runtime:
+  - `SSD_MOBILENET`: 4 output tensors (post-NMS from model), uint8 input, 300x300
+  - `YOLOV8`: 1 output tensor `[1, 4+num_classes, num_anchors]`, float32 input, 640x640; C++ NMS applied
+- Pre-allocated input buffer sized for largest model (640x640x3 = 1.2 MB/slot)
 - `state.py` `Store` is the single shared object between the gRPC thread and Streamlit's polling loop; all access is mutex-guarded
 - Proto stubs for Python are generated at Docker image build time (not committed to git); the server Dockerfile runs `grpc_tools.protoc` to emit `edge_ai_pb2.py` and `edge_ai_pb2_grpc.py` into `/app/server/`
 
@@ -53,13 +56,32 @@ test_grpc_client.py          # Python fake client to test server independently
 gen_test_frames.py           # Generate dummy test images into data/test_frames/
 ```
 
+## Local Python Environment Setup
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate          # activate once per shell session
+pip install -r requirements-dev.txt
+```
+`.venv/` is already in `.gitignore`.
+
+Includes: numpy, opencv-python, grpcio, grpcio-tools, protobuf, ultralytics (+ PyTorch ~1.5 GB first install).
+
 ## Build & Run
 ```bash
-bash models/download_model.sh          # Download SSD MobileNet v2 INT8 .tflite
+# Option A: SSD MobileNet v2 (default, INT8, fast build)
+bash models/download_model.sh
 pip install opencv-python numpy
-python gen_test_frames.py              # Populate data/test_frames/
-docker compose up --build              # Build + run both containers (device build ~15min first time)
+python gen_test_frames.py
+docker compose up --build
 # Server UI: http://localhost:8501
+
+# Option B: YOLOv8n float32 (higher mAP, ~10-15% better than SSD)
+pip install ultralytics
+python models/export_yolov8n.py        # Exports models/yolov8n_float32.tflite
+MODEL_PATH=/app/models/yolov8n_float32.tflite \
+LABELS_PATH=/app/models/coco80_labels.txt \
+docker compose up --build
 ```
 
 ## Test Server Independently
@@ -82,10 +104,11 @@ python -m grpc_tools.protoc -I proto --python_out=server --grpc_python_out=serve
 |---|---|---|
 | `SERVER_ADDR` | `server:50051` | gRPC server address |
 | `EDGE_ID` | `edge-1` | Device identifier sent in each frame |
-| `MODEL_PATH` | `/app/models/ssd_mobilenet_v2.tflite` | TFLite model path |
-| `LABELS_PATH` | `/app/models/coco_labels.txt` | COCO labels file |
+| `MODEL_PATH` | `/app/models/ssd_mobilenet_v2.tflite` | TFLite model path (SSD or YOLOv8) |
+| `LABELS_PATH` | `/app/models/coco_labels.txt` | Labels file (`coco_labels.txt` for SSD, `coco80_labels.txt` for YOLOv8) |
 | `INPUT_DIR` | `/app/data/test_frames` | Directory of input JPEG frames |
-| `CONF_THRESH` | `0.4` | Detection confidence threshold |
+| `CONF_THRESH` | `0.4` | Detection confidence threshold (pre-filter + NMS score gate) |
+| `IOU_THRESH` | `0.45` | NMS IoU threshold (higher = more overlapping boxes kept) |
 | `CAM_INDEX` | `0` | Camera device index for OPENCV backend (`/dev/videoN`) |
 | `HAL_CAMERA_BACKEND` | `FILE` | Compile-time HAL switch: `FILE` or `OPENCV` |
 
@@ -102,6 +125,8 @@ python -m grpc_tools.protoc -I proto --python_out=server --grpc_python_out=serve
 4. End-to-end: device → server → see detections in Streamlit
 5. ✅ Multi-threaded pipeline (3 pthreads + RingBuffer with POSIX semaphores)
 6. ✅ Webcam support (OpenCVFrameSource + compile-time HAL switching)
-7. Two-machine deployment (device on laptop B, server on laptop A)
-8. Kernel module (ml_stats.ko), bpftrace, QEMU ARM64 (bonus items)
-9. Prometheus + Grafana (replaces/supplements Streamlit metrics)
+7. ✅ YOLOv8n TFLite support + runtime model auto-detect (A1)
+8. ✅ NMS parameters (CONF_THRESH / IOU_THRESH) fully runtime-configurable (A2)
+9. Two-machine deployment (device on laptop B, server on laptop A)
+10. Kernel module (ml_stats.ko), bpftrace, QEMU ARM64 (bonus items)
+11. Prometheus + Grafana (replaces/supplements Streamlit metrics)

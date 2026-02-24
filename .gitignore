@@ -8,6 +8,13 @@ __pycache__/
 .venv/
 models/*.tflite
 data/test_frames/*.jpg
+data/test_frames/*.png
+
+# YOLOv8 export intermediates
+*.pt
+*.onnx
+*_saved_model/
+calibration_image_sample_data_20x128x128x3_float32.npy
 *.pb.cc
 *.pb.h
 *_pb2.py

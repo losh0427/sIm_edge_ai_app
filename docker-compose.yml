@@ -24,13 +24,20 @@ services:
     environment:
       - SERVER_ADDR=server:50051
       - EDGE_ID=edge-1
-      - MODEL_PATH=/app/models/ssd_mobilenet_v2.tflite
-      - LABELS_PATH=/app/models/coco_labels.txt
+      # --- SSD MobileNet v2 (default) ---
+      - MODEL_PATH=${MODEL_PATH:-/app/models/ssd_mobilenet_v2.tflite}
+      - LABELS_PATH=${LABELS_PATH:-/app/models/coco_labels.txt}
+      # --- YOLOv8n: run `python models/export_yolov8n.py` first, then override:
+      #     MODEL_PATH=/app/models/yolov8n_float32.tflite
+      #     LABELS_PATH=/app/models/coco80_labels.txt
       - INPUT_DIR=/app/data/test_frames
-      - CONF_THRESH=0.4
+      - CONF_THRESH=${CONF_THRESH:-0.4}
+      - IOU_THRESH=${IOU_THRESH:-0.45}
       - CAM_INDEX=${CAM_INDEX:-0}
     devices:
       - "/dev/video0:/dev/video0"
+    volumes:
+      - ./data:/app/data   # mount so test frames can be swapped without rebuilding
     depends_on:
       - server
     networks:

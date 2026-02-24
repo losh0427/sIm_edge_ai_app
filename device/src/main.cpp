@@ -30,6 +30,7 @@ int main(int argc, char** argv) {
     std::string server_addr = getenv("SERVER_ADDR") ? getenv("SERVER_ADDR") : "server:50051";
     std::string edge_id     = getenv("EDGE_ID")     ? getenv("EDGE_ID")     : "edge-1";
     float conf_threshold    = getenv("CONF_THRESH") ? atof(getenv("CONF_THRESH")) : 0.4f;
+    float iou_threshold     = getenv("IOU_THRESH")  ? atof(getenv("IOU_THRESH"))  : 0.45f;
 
     auto labels = load_labels(labels_path);
     fprintf(stderr, "Loaded %zu labels\n", labels.size());
@@ -67,6 +68,7 @@ int main(int argc, char** argv) {
     config.edge_id        = edge_id;
     config.hal_desc       = source->describe();
     config.conf_threshold = conf_threshold;
+    config.iou_threshold  = iou_threshold;
     config.labels         = labels;
 
     Pipeline pipeline;

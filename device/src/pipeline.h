@@ -12,6 +12,7 @@ struct PipelineConfig {
     std::string   edge_id;
     std::string   hal_desc;
     float         conf_threshold;
+    float         iou_threshold;
     std::vector<std::string> labels;
 };
 
