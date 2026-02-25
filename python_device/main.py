@@ -6,7 +6,7 @@ Pipeline: read frame → preprocess → TFLite inference → NMS → encode thum
 
 Used for benchmarking against the C++ implementation to quantify:
   - FPS throughput
-  - Per-frame latency
+  - Per-frame latency breakdown
   - Memory usage (RSS)
   - CPU utilisation
 """
@@ -14,6 +14,8 @@ import os
 import sys
 import glob
 import time
+import resource
+import csv
 
 import cv2
 import numpy as np
@@ -42,6 +44,10 @@ CAM_INDEX   = int(os.environ.get("CAM_INDEX", "0"))
 THUMB_MAX_W = 480
 THUMB_QUALITY = 80
 
+# Benchmark config
+BENCH_CSV     = os.environ.get("BENCH_CSV", "")       # set to path to enable CSV logging
+BENCH_WARMUP  = int(os.environ.get("BENCH_WARMUP", "100"))  # frames to skip
+
 # ---------------------------------------------------------------------------
 # Load labels
 # ---------------------------------------------------------------------------
@@ -59,7 +65,6 @@ LABELS = load_labels(LABELS_PATH)
 try:
     import tflite_runtime.interpreter as tflite
 except ImportError:
-    # Fallback: full TensorFlow's lite interpreter
     from tensorflow import lite as tflite
 
 def load_model(path):
@@ -72,7 +77,6 @@ def load_model(path):
     input_h, input_w = inp["shape"][1], inp["shape"][2]
     is_float = (inp["dtype"] == np.float32)
 
-    # Auto-detect model type
     if len(out_details) == 4:
         model_type = "SSD_MOBILENET"
     elif len(out_details) == 1 and len(out_details[0]["shape"]) == 3:
@@ -93,9 +97,9 @@ def run_inference(interpreter, inp_detail, input_data):
     interpreter.invoke()
 
 def parse_ssd_output(interpreter, out_details, conf_thresh):
-    boxes   = interpreter.get_tensor(out_details[0]["index"])[0]  # [N,4]
-    classes = interpreter.get_tensor(out_details[1]["index"])[0]  # [N]
-    scores  = interpreter.get_tensor(out_details[2]["index"])[0]  # [N]
+    boxes   = interpreter.get_tensor(out_details[0]["index"])[0]
+    classes = interpreter.get_tensor(out_details[1]["index"])[0]
+    scores  = interpreter.get_tensor(out_details[2]["index"])[0]
     count   = int(interpreter.get_tensor(out_details[3]["index"])[0])
 
     detections = []
@@ -111,7 +115,7 @@ def parse_ssd_output(interpreter, out_details, conf_thresh):
     return detections
 
 def parse_yolov8_output(interpreter, out_details, conf_thresh):
-    out = interpreter.get_tensor(out_details[0]["index"])[0]  # [feat_dim, num_anchors]
+    out = interpreter.get_tensor(out_details[0]["index"])[0]
     feat_dim, num_anchors = out.shape
     num_classes = feat_dim - 4
 
@@ -160,7 +164,7 @@ def nms_filter(detections, iou_thresh, score_thresh):
     return results
 
 # ---------------------------------------------------------------------------
-# Thumbnail encoding (aspect-ratio preserving, mirrors C++ encode_thumbnail_raw)
+# Thumbnail encoding (aspect-ratio preserving)
 # ---------------------------------------------------------------------------
 def encode_thumbnail(frame_bgr, max_w=THUMB_MAX_W, quality=THUMB_QUALITY):
     h, w = frame_bgr.shape[:2]
@@ -184,7 +188,6 @@ def file_frame_source(input_dir):
     if not files:
         print(f"No images found in {input_dir}", file=sys.stderr)
         return
-    # Loop forever (same as C++ FileFrameSource)
     while True:
         for path in files:
             frame = cv2.imread(path)
@@ -207,7 +210,13 @@ def opencv_frame_source(cam_index):
     cap.release()
 
 # ---------------------------------------------------------------------------
-# Main pipeline (single-threaded)
+# RSS helper
+# ---------------------------------------------------------------------------
+def get_rss_kb():
+    return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+
+# ---------------------------------------------------------------------------
+# Main pipeline (single-threaded, with benchmark instrumentation)
 # ---------------------------------------------------------------------------
 def main():
     print(f"Python device agent starting", file=sys.stderr)
@@ -215,19 +224,30 @@ def main():
     print(f"  MODEL_PATH={MODEL_PATH}", file=sys.stderr)
     print(f"  HAL_BACKEND={HAL_BACKEND}", file=sys.stderr)
 
-    # Load model
     interpreter, inp_detail, out_details, input_w, input_h, is_float, model_type = \
         load_model(MODEL_PATH)
 
-    # Frame source
     if HAL_BACKEND == "OPENCV":
         source = opencv_frame_source(CAM_INDEX)
     else:
         source = file_frame_source(INPUT_DIR)
 
-    # gRPC channel
     channel = grpc.insecure_channel(SERVER_ADDR)
     stub = edge_ai_pb2_grpc.EdgeServiceStub(channel)
+
+    # Benchmark CSV writer
+    csv_file = None
+    csv_writer = None
+    if BENCH_CSV:
+        csv_file = open(BENCH_CSV, "w", newline="")
+        csv_writer = csv.writer(csv_file)
+        csv_writer.writerow([
+            "frame", "capture_us", "preprocess_us", "inference_us",
+            "nms_us", "thumbnail_us", "grpc_us", "e2e_us",
+            "num_dets", "rss_kb",
+        ])
+        print(f"Benchmark CSV: {BENCH_CSV} (warmup={BENCH_WARMUP})",
+              file=sys.stderr)
 
     hal_desc = f"PYTHON:{HAL_BACKEND}"
     frame_num = 0
@@ -235,35 +255,38 @@ def main():
 
     for frame_bgr in source:
         frame_num += 1
-        t0 = time.monotonic()
+        t_start = time.perf_counter_ns()
 
-        # --- Preprocess: resize to model input ---
+        # --- Capture (already done by generator, measure overhead) ---
+        t_capture = time.perf_counter_ns()
+
+        # --- Preprocess ---
         frame_rgb = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2RGB)
         resized = cv2.resize(frame_rgb, (input_w, input_h))
-
         if is_float:
             input_data = np.expand_dims(resized.astype(np.float32) / 255.0, axis=0)
         else:
             input_data = np.expand_dims(resized, axis=0)
+        t_preprocess = time.perf_counter_ns()
 
         # --- Inference ---
         run_inference(interpreter, inp_detail, input_data)
-
         if model_type == "YOLOV8":
             raw_dets = parse_yolov8_output(interpreter, out_details, CONF_THRESH)
         else:
             raw_dets = parse_ssd_output(interpreter, out_details, CONF_THRESH)
-
-        t1 = time.monotonic()
-        inference_ms = (t1 - t0) * 1000.0
+        t_inference = time.perf_counter_ns()
 
         # --- NMS ---
         dets = nms_filter(raw_dets, IOU_THRESH, CONF_THRESH)
+        t_nms = time.perf_counter_ns()
 
         # --- Encode thumbnail ---
         thumbnail_jpeg, orig_w, orig_h = encode_thumbnail(frame_bgr)
+        t_thumbnail = time.perf_counter_ns()
 
         # --- gRPC send ---
+        inference_ms = (t_inference - t_preprocess) / 1e6
         req = edge_ai_pb2.DetectionFrame(
             edge_id=EDGE_ID,
             timestamp_ms=int(time.time() * 1000),
@@ -286,15 +309,37 @@ def main():
         try:
             stub.ReportDetection(req)
         except grpc.RpcError as e:
-            print(f"\rgRPC error: {e.code()}", file=sys.stderr, end="")
+            print(f"gRPC error: {e.code()}", file=sys.stderr, flush=True)
+        t_grpc = time.perf_counter_ns()
 
-        # --- Log ---
+        # --- Benchmark CSV ---
+        e2e_us = (t_grpc - t_start) / 1000
+        if csv_writer and frame_num > BENCH_WARMUP:
+            csv_writer.writerow([
+                frame_num,
+                int((t_capture - t_start) / 1000),
+                int((t_preprocess - t_capture) / 1000),
+                int((t_inference - t_preprocess) / 1000),
+                int((t_nms - t_inference) / 1000),
+                int((t_thumbnail - t_nms) / 1000),
+                int((t_grpc - t_thumbnail) / 1000),
+                int(e2e_us),
+                len(dets),
+                get_rss_kb(),
+            ])
+
+        # --- Console log ---
         elapsed = time.monotonic() - start_time
         fps = frame_num / elapsed if elapsed > 0 else 0
         if frame_num % 10 == 1 or frame_num <= 5:
             print(f"[py-device] Frame {frame_num} | {fps:.1f} FPS | "
-                  f"{inference_ms:.1f} ms | {len(dets)} dets",
+                  f"{inference_ms:.1f} ms | {len(dets)} dets | "
+                  f"e2e {e2e_us/1000:.1f} ms",
                   file=sys.stderr, flush=True)
+
+    if csv_file:
+        csv_file.close()
+        print(f"Benchmark CSV saved: {BENCH_CSV}", file=sys.stderr)
 
 if __name__ == "__main__":
     main()

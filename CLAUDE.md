@@ -86,9 +86,23 @@ LABELS_PATH=/app/models/coco80_labels.txt \
 docker compose up --build
 ```
 
+## Two-Machine Deployment (webcam + YOLOv8n)
+```bash
+# Machine A (server): run on the server machine
+docker compose up server --build
+# Dashboard: http://<server-ip>:8501
+
+# Machine B (device): run on the device machine with webcam
+SERVER_ADDR=<server-ip>:50051 \
+HAL_CAMERA_BACKEND=OPENCV \
+MODEL_PATH=/app/models/yolov8n_float32.tflite \
+LABELS_PATH=/app/models/coco80_labels.txt \
+docker compose up device --build
+```
+
 ## Test Server Independently
 ```bash
-docker compose up server
+docker compose up server --build
 pip install grpcio grpcio-tools opencv-python numpy protobuf
 python test_grpc_client.py localhost:50051
 ```

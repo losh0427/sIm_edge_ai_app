@@ -14,7 +14,7 @@
 ### 產出
 - `python_device/main.py` — 單線程 TFLite Python pipeline（讀圖 → 推論 → gRPC 送出）
 - `python_device/Dockerfile` — python:3.11-slim + tflite-runtime
-- `benchmark.sh` — 自動化跑 C++ vs Python，收集指標
+- `bench_cpp.sh` / `bench_python.sh` — 獨立 benchmark 腳本（Ctrl+C 停止 + 自動分析）
 - `docs/benchmark.md` — 數據表 + 分析
 
 ### 衡量指標
