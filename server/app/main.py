@@ -5,6 +5,7 @@ import time
 from collections import deque
 
 from fastapi import Response
+from fastapi.responses import StreamingResponse
 from nicegui import app, ui
 
 from app.state import store
@@ -47,6 +48,36 @@ def frame_jpeg(edge_id: str):
         return Response(status_code=404)
     jpeg = render_annotated_jpeg(result.thumbnail_jpeg, result.boxes, LABELS)
     return Response(content=jpeg, media_type="image/jpeg")
+
+
+# ---------------------------------------------------------------------------
+# MJPEG streaming endpoint: smooth video feed per device
+# ---------------------------------------------------------------------------
+def _mjpeg_generate(edge_id: str):
+    """Yield MJPEG frames as multipart chunks. Blocks on new frame arrival."""
+    last_frame = -1
+    while True:
+        store.wait_new_frame(edge_id, timeout=1.0)
+        latest = store.get_latest()
+        result = latest.get(edge_id)
+        if result is None or not result.thumbnail_jpeg:
+            continue
+        if result.frame_number == last_frame:
+            continue
+        last_frame = result.frame_number
+        jpeg = render_annotated_jpeg(result.thumbnail_jpeg, result.boxes, LABELS)
+        yield (
+            b"--frame\r\n"
+            b"Content-Type: image/jpeg\r\n\r\n" + jpeg + b"\r\n"
+        )
+
+
+@app.get("/api/stream/{edge_id}")
+def mjpeg_stream(edge_id: str):
+    return StreamingResponse(
+        _mjpeg_generate(edge_id),
+        media_type="multipart/x-mixed-replace; boundary=frame",
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -130,9 +161,6 @@ def _tick():
         dc["status_icon"].classes(add=color_cls)
         dc["status_icon"].update()
 
-        # Image: point to FastAPI endpoint with cache-bust
-        dc["image"].set_source(f"/api/frame/{edge_id}?t={int(now * 1000)}")
-
         # Metrics
         dc["latency_lbl"].set_text(f"Latency: {result.latency_ms:.1f} ms")
         dc["det_lbl"].set_text(f"Detections: {len(result.boxes)}")
@@ -169,7 +197,9 @@ def _ensure_device_card(edge_id: str):
                 status_icon = ui.icon("circle").classes("text-green-500")
                 ui.label(edge_id).classes("text-xl font-bold")
 
-            image = ui.image("").classes("w-full")
+            image = ui.html(
+                f'<img src="/api/stream/{edge_id}" style="width:100%">'
+            )
 
             with ui.row().classes("gap-6 flex-wrap"):
                 latency_lbl = ui.label("Latency: — ms")

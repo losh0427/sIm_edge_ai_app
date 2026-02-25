@@ -1,18 +1,37 @@
 #!/usr/bin/env python3
-"""Generate test images for FileFrameSource testing."""
-import numpy as np
+"""Capture test frames from webcam into data/test_frames/."""
 import cv2
 import os
+import time
 
-os.makedirs("data/test_frames", exist_ok=True)
+NUM_FRAMES = 10
+DELAY_BEFORE = 3
+INTERVAL = 1.0
+OUT_DIR = "data/test_frames"
 
-for i in range(5):
-    img = np.random.randint(40, 200, (480, 640, 3), dtype=np.uint8)
-    # Draw some rectangles to simulate objects
-    cv2.rectangle(img, (100 + i*20, 100), (300 + i*20, 350), (0, 255, 0), 3)
-    cv2.rectangle(img, (350, 200 + i*10), (550, 400 + i*10), (255, 0, 0), 3)
-    cv2.putText(img, f"Test Frame {i}", (200, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
-    cv2.imwrite(f"data/test_frames/frame_{i:03d}.jpg", img)
-    print(f"Generated frame_{i:03d}.jpg")
+os.makedirs(OUT_DIR, exist_ok=True)
 
-print("Done. Test frames in data/test_frames/")
+cap = cv2.VideoCapture(0)
+if not cap.isOpened():
+    print("ERROR: cannot open /dev/video0")
+    exit(1)
+
+w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+print(f"Camera opened: {w}x{h}")
+print(f"Waiting {DELAY_BEFORE}s before capture...")
+time.sleep(DELAY_BEFORE)
+
+for i in range(NUM_FRAMES):
+    ret, frame = cap.read()
+    if not ret:
+        print(f"ERROR: failed to read frame {i}")
+        break
+    path = os.path.join(OUT_DIR, f"frame_{i:03d}.jpg")
+    cv2.imwrite(path, frame)
+    print(f"[{i+1}/{NUM_FRAMES}] Saved {path}")
+    if i < NUM_FRAMES - 1:
+        time.sleep(INTERVAL)
+
+cap.release()
+print(f"Done. {NUM_FRAMES} frames saved to {OUT_DIR}/")
