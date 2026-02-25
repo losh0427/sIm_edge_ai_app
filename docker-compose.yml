@@ -43,6 +43,29 @@ services:
     networks:
       - edge-net
 
+  py-device:
+    build:
+      context: .
+      dockerfile: python_device/Dockerfile
+    environment:
+      - SERVER_ADDR=${SERVER_ADDR:-server:50051}
+      - EDGE_ID=py-edge-1
+      - MODEL_PATH=${MODEL_PATH:-/app/models/ssd_mobilenet_v2.tflite}
+      - LABELS_PATH=${LABELS_PATH:-/app/models/coco_labels.txt}
+      - INPUT_DIR=/app/data/test_frames
+      - CONF_THRESH=${CONF_THRESH:-0.4}
+      - IOU_THRESH=${IOU_THRESH:-0.45}
+      - HAL_CAMERA_BACKEND=${HAL_CAMERA_BACKEND:-FILE}
+      - CAM_INDEX=${CAM_INDEX:-0}
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models:ro
+    depends_on:
+      - server
+    networks:
+      - edge-net
+
 networks:
   edge-net:
     driver: bridge

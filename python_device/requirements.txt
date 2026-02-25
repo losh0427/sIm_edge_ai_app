@@ -1,0 +1,6 @@
+tflite-runtime==2.14.0
+grpcio==1.60.0
+grpcio-tools==1.60.0
+protobuf==4.25.0
+opencv-python-headless==4.9.0.80
+numpy==1.26.0
