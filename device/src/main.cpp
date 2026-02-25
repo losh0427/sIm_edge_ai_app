@@ -60,6 +60,10 @@ int main(int argc, char** argv) {
     GrpcClient grpc;
     grpc.connect(server_addr);
 
+    // Benchmark config
+    std::string bench_csv = getenv("BENCH_CSV") ? getenv("BENCH_CSV") : "";
+    int bench_warmup      = getenv("BENCH_WARMUP") ? atoi(getenv("BENCH_WARMUP")) : 100;
+
     // Build pipeline config and run
     PipelineConfig config;
     config.source         = source.get();
@@ -70,6 +74,8 @@ int main(int argc, char** argv) {
     config.conf_threshold = conf_threshold;
     config.iou_threshold  = iou_threshold;
     config.labels         = labels;
+    config.bench_csv      = bench_csv;
+    config.bench_warmup   = bench_warmup;
 
     Pipeline pipeline;
     g_pipeline = &pipeline;

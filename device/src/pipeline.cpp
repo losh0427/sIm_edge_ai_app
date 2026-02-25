@@ -11,6 +11,12 @@
 
 static constexpr int kRingSlots = 4;
 
+// Nanosecond timestamp helper
+static inline int64_t now_ns() {
+    return std::chrono::duration_cast<std::chrono::nanoseconds>(
+        std::chrono::steady_clock::now().time_since_epoch()).count();
+}
+
 struct Pipeline::Impl {
     PipelineConfig config;
 
@@ -120,12 +126,16 @@ void Pipeline::recv_loop() {
     int frame_num = 0;
 
     while (!impl_->ring_a.is_shutdown()) {
+        int64_t t_cap_start = now_ns();
+
         Frame frame;
         if (!cfg.source->next_frame(frame)) {
             fprintf(stderr, "[recv] no more frames, shutting down pipeline\n");
             impl_->ring_a.shutdown();
             break;
         }
+
+        int64_t t_cap_end = now_ns();
 
         InferSlot* slot = impl_->ring_a.acquire_write_slot();
         if (!slot) break;
@@ -143,6 +153,13 @@ void Pipeline::recv_loop() {
         // Copy original frame data for thumbnail encoding later
         int copy_size = std::min((int)frame.data.size(), kOrigDataSize);
         memcpy(slot->orig_data, frame.data.data(), copy_size);
+
+        int64_t t_preproc_end = now_ns();
+
+        // Benchmark timestamps
+        slot->ts_capture_start  = t_cap_start;
+        slot->ts_capture_end    = t_cap_end;
+        slot->ts_preprocess_end = t_preproc_end;
 
         impl_->ring_a.commit_write_slot();
     }
@@ -165,14 +182,17 @@ void Pipeline::infer_loop() {
 
         // Run inference (pre-filter with conf_threshold to reduce NMS workload)
         int actual_input_size = cfg.inference->input_width() * cfg.inference->input_height() * 3;
-        auto t0 = std::chrono::steady_clock::now();
+        int64_t t_infer_start = now_ns();
         auto raw_dets = cfg.inference->run(in_slot->input_data, actual_input_size,
                                            cfg.conf_threshold);
-        auto t1 = std::chrono::steady_clock::now();
-        float latency_ms = std::chrono::duration<float, std::milli>(t1 - t0).count();
+        int64_t t_infer_end = now_ns();
+
+        float latency_ms = (t_infer_end - t_infer_start) / 1e6f;
 
         // NMS + confidence filter
+        int64_t t_nms_start = now_ns();
         auto filtered = postprocess::nms_filter(raw_dets, cfg.iou_threshold, cfg.conf_threshold);
+        int64_t t_nms_end = now_ns();
 
         // Acquire upload slot
         UploadSlot* out_slot = impl_->ring_b.acquire_write_slot();
@@ -189,6 +209,13 @@ void Pipeline::infer_loop() {
             out_slot->detections[i] = filtered[i];
         }
         memcpy(out_slot->orig_data, in_slot->orig_data, kOrigDataSize);
+
+        // Carry benchmark timestamps
+        out_slot->ts_capture_start  = in_slot->ts_capture_start;
+        out_slot->ts_capture_us     = (in_slot->ts_capture_end - in_slot->ts_capture_start) / 1000;
+        out_slot->ts_preprocess_us  = (in_slot->ts_preprocess_end - in_slot->ts_capture_end) / 1000;
+        out_slot->ts_inference_us   = (t_infer_end - t_infer_start) / 1000;
+        out_slot->ts_nms_us         = (t_nms_end - t_nms_start) / 1000;
 
         impl_->ring_a.commit_read_slot();
         impl_->ring_b.commit_write_slot();
@@ -209,6 +236,18 @@ void Pipeline::upload_loop() {
     auto start_time = std::chrono::steady_clock::now();
     int uploaded = 0;
 
+    // Benchmark CSV file
+    FILE* bench_fp = nullptr;
+    if (!cfg.bench_csv.empty()) {
+        bench_fp = fopen(cfg.bench_csv.c_str(), "w");
+        if (bench_fp) {
+            fprintf(bench_fp, "frame,capture_us,preprocess_us,inference_us,"
+                              "nms_us,thumbnail_us,grpc_us,e2e_us,num_dets\n");
+            fprintf(stderr, "[upload] Benchmark CSV: %s (warmup=%d)\n",
+                    cfg.bench_csv.c_str(), cfg.bench_warmup);
+        }
+    }
+
     while (true) {
         UploadSlot* slot = impl_->ring_b.acquire_read_slot();
         if (!slot) break;
@@ -217,8 +256,17 @@ void Pipeline::upload_loop() {
         std::vector<Detection> dets(slot->detections, slot->detections + slot->detection_count);
 
         // Encode thumbnail from original frame
+        int64_t t_thumb_start = now_ns();
         auto thumbnail = preprocess::encode_thumbnail_raw(
             slot->orig_data, kOrigWidth, kOrigHeight, kOrigChannels);
+        int64_t t_thumb_end = now_ns();
+
+        // Send via gRPC
+        int64_t t_grpc_start = now_ns();
+        cfg.grpc->send_detection(cfg.edge_id, dets, thumbnail,
+                                 slot->inference_latency_ms, slot->frame_number,
+                                 cfg.hal_desc, kOrigWidth, kOrigHeight);
+        int64_t t_grpc_end = now_ns();
 
         // Log
         uploaded++;
@@ -237,12 +285,30 @@ void Pipeline::upload_loop() {
                     lbl, d.confidence, d.x_min, d.y_min, d.x_max, d.y_max);
         }
 
-        // Send via gRPC
-        cfg.grpc->send_detection(cfg.edge_id, dets, thumbnail,
-                                 slot->inference_latency_ms, slot->frame_number,
-                                 cfg.hal_desc, kOrigWidth, kOrigHeight);
+        // Write benchmark CSV (skip warmup frames)
+        if (bench_fp && slot->frame_number > cfg.bench_warmup) {
+            int64_t thumb_us = (t_thumb_end - t_thumb_start) / 1000;
+            int64_t grpc_us  = (t_grpc_end - t_grpc_start) / 1000;
+            int64_t e2e_us   = (t_grpc_end - slot->ts_capture_start) / 1000;
+
+            fprintf(bench_fp, "%d,%lld,%lld,%lld,%lld,%lld,%lld,%lld,%d\n",
+                    slot->frame_number,
+                    (long long)slot->ts_capture_us,
+                    (long long)slot->ts_preprocess_us,
+                    (long long)slot->ts_inference_us,
+                    (long long)slot->ts_nms_us,
+                    (long long)thumb_us,
+                    (long long)grpc_us,
+                    (long long)e2e_us,
+                    slot->detection_count);
+        }
 
         impl_->ring_b.commit_read_slot();
+    }
+
+    if (bench_fp) {
+        fclose(bench_fp);
+        fprintf(stderr, "\n[upload] Benchmark CSV saved\n");
     }
 
     fprintf(stderr, "\n[upload] thread exiting (frames uploaded: %d)\n", uploaded);

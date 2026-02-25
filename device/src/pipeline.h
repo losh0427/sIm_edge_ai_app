@@ -14,6 +14,8 @@ struct PipelineConfig {
     float         conf_threshold;
     float         iou_threshold;
     std::vector<std::string> labels;
+    std::string   bench_csv;    // if non-empty, write per-frame CSV
+    int           bench_warmup; // frames to skip before recording
 };
 
 class Pipeline {

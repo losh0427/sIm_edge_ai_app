@@ -20,6 +20,11 @@ struct InferSlot {
     uint8_t input_data[kMaxModelInputSize];  // resized model input (up to 640x640x3)
     uint8_t orig_data[kOrigDataSize];     // original frame for thumbnail later
     int     frame_number;
+
+    // Benchmark timestamps (nanoseconds, CLOCK_MONOTONIC)
+    int64_t ts_capture_start;
+    int64_t ts_capture_end;
+    int64_t ts_preprocess_end;
 };
 
 // Slot passed from infer thread → upload thread (Ring B)
@@ -29,4 +34,11 @@ struct UploadSlot {
     uint8_t   orig_data[kOrigDataSize];   // original frame for thumbnail encoding
     int       frame_number;
     float     inference_latency_ms;
+
+    // Benchmark timestamps carried from upstream
+    int64_t ts_capture_start;
+    int64_t ts_capture_us;      // capture duration
+    int64_t ts_preprocess_us;   // preprocess duration
+    int64_t ts_inference_us;    // inference duration
+    int64_t ts_nms_us;          // NMS duration
 };
