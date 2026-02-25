@@ -16,6 +16,65 @@ Machine B (Device)  本機 (WSL2)
 
 ---
 
+## 網路設定（Server 端 — Windows + WSL2）
+
+Docker container 跑在 WSL2 裡面，但外部裝置（Machine B）要透過 Windows 的 Wi-Fi IP 連進來。
+需要兩層設定：**Windows 防火牆** + **port proxy（Windows → WSL2 轉發）**。
+
+### 一次性設定：防火牆放行
+
+```powershell
+# 管理員 PowerShell — 只需做一次，重開機後仍有效
+New-NetFirewallRule -DisplayName "WSL2 gRPC 50051" `
+  -Direction Inbound -Action Allow -Protocol TCP -LocalPort 50051
+
+New-NetFirewallRule -DisplayName "WSL2 Streamlit 8501" `
+  -Direction Inbound -Action Allow -Protocol TCP -LocalPort 8501
+```
+
+驗證規則存在：
+```powershell
+Get-NetFirewallRule -DisplayName "WSL2*" | Format-Table DisplayName, Enabled
+```
+
+### 每次重開機要檢查：port proxy
+
+Port proxy 規則本身是**永久的**（重開機不會消失），但 WSL2 的內部 IP **每次重啟可能會變**。
+如果 IP 變了，要刪掉舊規則重建。
+
+```powershell
+# 管理員 PowerShell
+
+# 1. 查看目前規則
+netsh interface portproxy show v4tov4
+
+# 2. 進 WSL 查看目前 IP
+wsl -- hostname -I
+# 例如輸出: 172.21.49.121
+
+# 3. 如果 IP 和規則一致 → 不用動
+#    如果 IP 變了 → 刪掉重建：
+netsh interface portproxy delete v4tov4 listenport=50051 listenaddress=0.0.0.0
+netsh interface portproxy delete v4tov4 listenport=8501  listenaddress=0.0.0.0
+
+netsh interface portproxy add v4tov4 listenport=50051 listenaddress=0.0.0.0 connectport=50051 connectaddress=<WSL_IP>
+netsh interface portproxy add v4tov4 listenport=8501  listenaddress=0.0.0.0 connectport=8501  connectaddress=<WSL_IP>
+```
+
+### 重開機快速 Checklist（Server 端）
+
+```
+□  1. [WSL]        wsl -- hostname -I                     → 記下 WSL IP
+□  2. [PowerShell] netsh interface portproxy show v4tov4  → 比對 IP
+□  3. 如果 IP 不同 → 刪舊規則 + 加新規則（上方指令）
+□  4. 如果 IP 相同 → 不用動，直接啟動 server
+```
+
+> **為何不需要重建防火牆規則？** `New-NetFirewallRule` 寫入 Windows registry，永久有效。
+> **為何 port proxy 可能要改？** WSL2 用虛擬 NAT，每次啟動 IP 不固定。
+
+---
+
 ## 前置：下載模型（兩台都要，第一次才做）
 
 ```bash

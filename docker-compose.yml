@@ -22,7 +22,7 @@ services:
       args:
         - HAL_CAMERA_BACKEND=${HAL_CAMERA_BACKEND:-FILE}
     environment:
-      - SERVER_ADDR=server:50051
+      - SERVER_ADDR=${SERVER_ADDR:-server:50051}
       - EDGE_ID=edge-1
       # --- SSD MobileNet v2 (default) ---
       - MODEL_PATH=${MODEL_PATH:-/app/models/ssd_mobilenet_v2.tflite}
