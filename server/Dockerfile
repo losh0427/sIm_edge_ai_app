@@ -1,3 +1,4 @@
+# NiceGUI dashboard + gRPC server
 FROM python:3.11-slim
 
 RUN apt-get update && apt-get install -y \
@@ -21,6 +22,7 @@ RUN python -m grpc_tools.protoc \
     /app/proto/edge_ai.proto
 
 WORKDIR /app/server
+# 50051 = gRPC, 8501 = NiceGUI dashboard
 EXPOSE 50051 8501
 
 CMD ["python", "entrypoint.py"]

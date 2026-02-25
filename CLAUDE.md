@@ -3,18 +3,18 @@
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## What This Is
-IoT edge device simulation: C++ agent reads images → TFLite object detection (SSD MobileNet v2 or YOLOv8n) → gRPC → Python server with Streamlit UI.
+IoT edge device simulation: C++ agent reads images → TFLite object detection (SSD MobileNet v2 or YOLOv8n) → gRPC → Python server with NiceGUI dashboard (FastAPI + WebSocket).
 Portfolio project targeting Google Taiwan new grad SWE (Home/Nest/ChromeOS/Cloud).
 
 ## Architecture (MVP V1 - Current)
 - **Single machine**, two Docker containers on same `edge-net` bridge network
 - `device`: C++ agent — FileFrameSource reads test JPEGs → preprocess (resize) → TFLite INT8 inference → hand-written NMS → gRPC client sends DetectionFrame to server
-- `server`: Python — gRPC receiver stores results → Streamlit UI draws bounding boxes on thumbnails, shows live stats
+- `server`: Python — gRPC receiver stores results → NiceGUI dashboard draws bounding boxes on thumbnails, shows live stats + ECharts time-series
 - Both containers built from repo root context via `docker compose up --build`
 
 ## Tech Stack
 - **Device**: C++17, CMake, TFLite (built from source v2.14.0), OpenCV, gRPC C++, POSIX APIs
-- **Server**: Python 3.11, Streamlit, gRPC, OpenCV
+- **Server**: Python 3.11, NiceGUI (FastAPI/uvicorn), gRPC, OpenCV
 - **Infra**: Docker Compose, protobuf
 
 ## Key Design Decisions
@@ -27,7 +27,7 @@ Portfolio project targeting Google Taiwan new grad SWE (Home/Nest/ChromeOS/Cloud
   - `SSD_MOBILENET`: 4 output tensors (post-NMS from model), uint8 input, 300x300
   - `YOLOV8`: 1 output tensor `[1, 4+num_classes, num_anchors]`, float32 input, 640x640; C++ NMS applied
 - Pre-allocated input buffer sized for largest model (640x640x3 = 1.2 MB/slot)
-- `state.py` `Store` is the single shared object between the gRPC thread and Streamlit's polling loop; all access is mutex-guarded
+- `state.py` `Store` is the single shared object between the gRPC thread and NiceGUI's timer callback; all access is mutex-guarded
 - Proto stubs for Python are generated at Docker image build time (not committed to git); the server Dockerfile runs `grpc_tools.protoc` to emit `edge_ai_pb2.py` and `edge_ai_pb2_grpc.py` into `/app/server/`
 
 ## Code Style
@@ -46,9 +46,11 @@ device/
   src/                       # main.cpp, pipeline, ring_buffer, preprocess, inference, postprocess(NMS), grpc_client, labels
 server/
   Dockerfile                 # Generates proto Python stubs at build time
-  app/main.py                # Streamlit UI + gRPC server startup (starts gRPC in background thread)
+  app/main.py                # NiceGUI dashboard (@ui.page + FastAPI endpoints)
+  app/draw.py                # Pure drawing utilities (draw_boxes, render_annotated_jpeg)
   app/grpc_server.py         # EdgeServicer (ReportDetection, ReportStats)
-  app/state.py               # Thread-safe Store shared between gRPC and Streamlit
+  app/state.py               # Thread-safe Store shared between gRPC and NiceGUI
+  entrypoint.py              # Starts gRPC server + ui.run()
 models/                      # .tflite model + coco_labels.txt (model not in git)
 data/test_frames/            # Test JPEGs (not in git)
 docker-compose.yml           # server(:8501,:50051) + device, edge-net bridge
@@ -122,11 +124,12 @@ python -m grpc_tools.protoc -I proto --python_out=server --grpc_python_out=serve
 1. ✅ MVP code written (single-threaded, FileFrameSource, single machine Docker)
 2. Get server running and verified with test_grpc_client.py
 3. Get device Docker build passing (TFLite + gRPC linking)
-4. End-to-end: device → server → see detections in Streamlit
+4. End-to-end: device → server → see detections in NiceGUI dashboard
 5. ✅ Multi-threaded pipeline (3 pthreads + RingBuffer with POSIX semaphores)
 6. ✅ Webcam support (OpenCVFrameSource + compile-time HAL switching)
 7. ✅ YOLOv8n TFLite support + runtime model auto-detect (A1)
 8. ✅ NMS parameters (CONF_THRESH / IOU_THRESH) fully runtime-configurable (A2)
 9. Two-machine deployment (device on laptop B, server on laptop A)
 10. Kernel module (ml_stats.ko), bpftrace, QEMU ARM64 (bonus items)
-11. Prometheus + Grafana (replaces/supplements Streamlit metrics)
+11. ✅ NiceGUI dashboard migration (FastAPI + WebSocket, ECharts, dark mode, device status)
+12. Prometheus + Grafana (supplements NiceGUI dashboard via FastAPI endpoints)

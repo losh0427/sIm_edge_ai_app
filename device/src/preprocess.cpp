@@ -10,12 +10,15 @@ std::vector<uint8_t> resize(const Frame& frame, int target_w, int target_h) {
     return std::vector<uint8_t>(dst.data, dst.data + dst.total() * dst.elemSize());
 }
 
-std::vector<uint8_t> encode_thumbnail(const Frame& frame, int thumb_w, int thumb_h, int quality) {
+std::vector<uint8_t> encode_thumbnail(const Frame& frame, int max_w, int quality) {
     cv::Mat src(frame.height, frame.width, CV_8UC3, const_cast<uint8_t*>(frame.data.data()));
-    cv::Mat rgb;
-    cv::cvtColor(src, rgb, cv::COLOR_RGB2BGR);  // OpenCV imencode expects BGR
+    cv::Mat bgr;
+    cv::cvtColor(src, bgr, cv::COLOR_RGB2BGR);  // OpenCV imencode expects BGR
+    // Aspect-ratio preserving resize: scale to max_w, compute height proportionally
+    int thumb_w = (src.cols <= max_w) ? src.cols : max_w;
+    int thumb_h = thumb_w * src.rows / src.cols;
     cv::Mat resized;
-    cv::resize(rgb, resized, cv::Size(thumb_w, thumb_h));
+    cv::resize(bgr, resized, cv::Size(thumb_w, thumb_h), 0, 0, cv::INTER_AREA);
     std::vector<uint8_t> buf;
     cv::imencode(".jpg", resized, buf, {cv::IMWRITE_JPEG_QUALITY, quality});
     return buf;
@@ -30,12 +33,15 @@ void resize_into(const Frame& frame, int target_w, int target_h, uint8_t* out_bu
 }
 
 std::vector<uint8_t> encode_thumbnail_raw(const uint8_t* rgb_data, int w, int h, int channels,
-                                          int thumb_w, int thumb_h, int quality) {
+                                          int max_w, int quality) {
     cv::Mat src(h, w, CV_8UC3, const_cast<uint8_t*>(rgb_data));
     cv::Mat bgr;
     cv::cvtColor(src, bgr, cv::COLOR_RGB2BGR);
+    // Aspect-ratio preserving resize
+    int thumb_w = (w <= max_w) ? w : max_w;
+    int thumb_h = thumb_w * h / w;
     cv::Mat resized;
-    cv::resize(bgr, resized, cv::Size(thumb_w, thumb_h));
+    cv::resize(bgr, resized, cv::Size(thumb_w, thumb_h), 0, 0, cv::INTER_AREA);
     std::vector<uint8_t> buf;
     cv::imencode(".jpg", resized, buf, {cv::IMWRITE_JPEG_QUALITY, quality});
     return buf;

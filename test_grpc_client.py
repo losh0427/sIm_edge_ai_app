@@ -19,9 +19,9 @@ def main():
     channel = grpc.insecure_channel(server)
     stub = edge_ai_pb2_grpc.EdgeServiceStub(channel)
 
-    # Create dummy thumbnail
-    img = np.random.randint(0, 255, (120, 160, 3), dtype=np.uint8)
-    cv2.putText(img, "TEST", (40, 70), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+    # Create dummy thumbnail (480x270 = 16:9, matching common webcam aspect ratio)
+    img = np.random.randint(0, 255, (270, 480, 3), dtype=np.uint8)
+    cv2.putText(img, "TEST", (180, 150), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 3)
     _, jpeg = cv2.imencode(".jpg", img)
 
     for i in range(100):

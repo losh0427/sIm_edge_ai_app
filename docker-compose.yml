@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: server/Dockerfile
     ports:
-      - "8501:8501"   # Streamlit UI
+      - "8501:8501"   # NiceGUI dashboard
       - "50051:50051" # gRPC
     environment:
       - PYTHONUNBUFFERED=1
