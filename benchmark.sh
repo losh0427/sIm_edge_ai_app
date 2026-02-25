@@ -1,109 +1,167 @@
 #!/bin/bash
-# ------------------------------------------------------------------
-# Benchmark: C++ device vs Python device
+# ======================================================================
+# Edge AI Benchmark: C++ device vs Python device
 #
-# Prerequisites:
-#   - models/ has the .tflite model file
-#   - data/test_frames/ has test JPEGs
-#   - docker compose images are built
+# 在 DEVICE 機器上執行。Server 需已在遠端啟動。
 #
-# Usage:
-#   bash benchmark.sh                         # default: SSD MobileNet, FILE
+# 用法:
+#   # 1. 遠端 server 機器先啟動:
+#   #    docker compose up server --build
+#
+#   # 2. 本機(device)執行 benchmark:
+#   #    FILE 模式 (本機 server):
+#   bash benchmark.sh
+#
+#   #    兩機 + webcam:
+#   SERVER_ADDR=192.168.0.195:50051 \
+#   HAL_CAMERA_BACKEND=OPENCV \
 #   MODEL_PATH=/app/models/yolov8n_float32.tflite \
 #   LABELS_PATH=/app/models/coco80_labels.txt \
-#   bash benchmark.sh                         # YOLOv8n
-# ------------------------------------------------------------------
+#   bash benchmark.sh
+# ======================================================================
 set -e
 
-DURATION=${BENCHMARK_DURATION:-30}  # seconds to sample docker stats
+# --- Config ---
+DURATION=${BENCH_DURATION:-60}          # seconds per run
+WARMUP=${BENCH_WARMUP:-100}             # frames to skip before recording
+RUNS=${BENCH_RUNS:-3}                   # repeat count
 RESULTS_DIR="benchmark_results"
-mkdir -p "$RESULTS_DIR"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+RUN_DIR="${RESULTS_DIR}/${TIMESTAMP}"
 
-echo "=== Edge AI Benchmark ==="
-echo "Duration: ${DURATION}s per test"
-echo ""
+mkdir -p "$RUN_DIR"
 
-# ------------------------------------------------------------------
-# Helper: run a device service and collect stats
-# ------------------------------------------------------------------
-run_benchmark() {
-    local SERVICE=$1
-    local LABEL=$2
-    local OUTFILE="${RESULTS_DIR}/${TIMESTAMP}_${LABEL}.txt"
+cat <<EOF
+======================================
+  Edge AI Benchmark
+======================================
+  Server:     ${SERVER_ADDR:-server:50051}
+  Model:      ${MODEL_PATH:-/app/models/ssd_mobilenet_v2.tflite}
+  HAL:        ${HAL_CAMERA_BACKEND:-FILE}
+  Duration:   ${DURATION}s per run
+  Warmup:     ${WARMUP} frames
+  Runs:       ${RUNS}x per agent (alternating)
+  Output:     ${RUN_DIR}/
+======================================
 
-    echo "--- Starting: $LABEL ---"
+EOF
 
-    # Start server + target device
-    docker compose up -d server
-    sleep 3  # wait for server to be ready
-    docker compose up -d "$SERVICE"
-    sleep 2  # wait for device to start inference
+# --- Save benchmark config ---
+cat > "${RUN_DIR}/config.txt" <<CONF
+timestamp=$TIMESTAMP
+server_addr=${SERVER_ADDR:-server:50051}
+model_path=${MODEL_PATH:-/app/models/ssd_mobilenet_v2.tflite}
+hal_backend=${HAL_CAMERA_BACKEND:-FILE}
+conf_thresh=${CONF_THRESH:-0.4}
+iou_thresh=${IOU_THRESH:-0.45}
+duration_s=$DURATION
+warmup_frames=$WARMUP
+runs=$RUNS
+CONF
 
+# ======================================================================
+# Helper: run one benchmark iteration
+# ======================================================================
+run_one() {
+    local SERVICE=$1    # "device" or "py-device"
+    local LABEL=$2      # "cpp" or "python"
+    local RUN_NUM=$3    # 1, 2, 3...
+    local PREFIX="${RUN_DIR}/${LABEL}_run${RUN_NUM}"
+    local CSV_NAME="bench_${LABEL}_run${RUN_NUM}.csv"
+
+    echo ""
+    echo "--- ${LABEL} run #${RUN_NUM} ---"
+
+    # Start device container with BENCH_CSV set
+    BENCH_CSV="/app/data/${CSV_NAME}" \
+    BENCH_WARMUP="${WARMUP}" \
+    docker compose up "$SERVICE" -d --build 2>/dev/null
+
+    sleep 3
     local CONTAINER
-    CONTAINER=$(docker compose ps -q "$SERVICE")
+    CONTAINER=$(docker compose ps -q "$SERVICE" 2>/dev/null)
 
     if [ -z "$CONTAINER" ]; then
         echo "ERROR: container for $SERVICE not found"
-        docker compose down
-        return
+        return 1
     fi
 
-    echo "Collecting stats for ${DURATION}s..."
-    echo "# Benchmark: $LABEL  $(date)" > "$OUTFILE"
-    echo "# Duration: ${DURATION}s" >> "$OUTFILE"
-    echo "# Container: $CONTAINER" >> "$OUTFILE"
-    echo "" >> "$OUTFILE"
+    echo "  Container: $CONTAINER"
+    echo "  Running for ${DURATION}s (warmup=${WARMUP} frames)..."
 
-    # Collect docker stats samples
-    echo "timestamp,cpu_pct,mem_usage,mem_limit,mem_pct,net_io,pids" >> "$OUTFILE"
-    for i in $(seq 1 "$DURATION"); do
-        docker stats "$CONTAINER" --no-stream --format \
-            "{{.CPUPerc}},{{.MemUsage}},{{.MemLimit}},{{.MemPerc}},{{.NetIO}},{{.PIDs}}" \
-            >> "$OUTFILE" 2>/dev/null
-        sleep 1
-    done
+    # Collect docker stats in background
+    local STATS_FILE="${PREFIX}_docker_stats.csv"
+    echo "timestamp,cpu_pct,mem_usage,mem_pct,net_io,pids" > "$STATS_FILE"
+    (
+        for i in $(seq 1 "$DURATION"); do
+            docker stats "$CONTAINER" --no-stream --format \
+                '{{.CPUPerc}},{{.MemUsage}},{{.MemPerc}},{{.NetIO}},{{.PIDs}}' 2>/dev/null | \
+                while IFS= read -r line; do
+                    echo "$(date +%s),$line"
+                done >> "$STATS_FILE"
+            sleep 1
+        done
+    ) &
+    local STATS_PID=$!
 
-    # Capture device logs (contains FPS / latency)
-    echo "" >> "$OUTFILE"
-    echo "# --- Device Logs ---" >> "$OUTFILE"
-    docker compose logs "$SERVICE" --tail=50 >> "$OUTFILE" 2>&1
+    # Wait for duration
+    sleep "$DURATION"
 
-    # Get final memory RSS
-    echo "" >> "$OUTFILE"
-    echo "# --- Final Stats ---" >> "$OUTFILE"
-    docker stats "$CONTAINER" --no-stream >> "$OUTFILE" 2>/dev/null
+    # Stop stats collection
+    kill "$STATS_PID" 2>/dev/null || true
+    wait "$STATS_PID" 2>/dev/null || true
 
-    echo "Stopping $SERVICE..."
-    docker compose stop "$SERVICE"
-    docker compose stop server
-    sleep 2
+    # Save device logs
+    docker compose logs "$SERVICE" --tail=200 > "${PREFIX}_device.log" 2>&1
 
-    echo "Results saved: $OUTFILE"
-    echo ""
+    # Final snapshot
+    docker stats "$CONTAINER" --no-stream > "${PREFIX}_final_stats.txt" 2>/dev/null
+
+    # Stop device
+    docker compose stop "$SERVICE" 2>/dev/null
+
+    # Copy benchmark CSV from data/ volume
+    if [ -f "data/${CSV_NAME}" ]; then
+        cp "data/${CSV_NAME}" "${PREFIX}_latency.csv"
+        echo "  Latency CSV: ${PREFIX}_latency.csv"
+    else
+        echo "  WARN: no latency CSV found (data/${CSV_NAME})"
+    fi
+
+    echo "  Docker stats: ${STATS_FILE}"
+    echo "  Device log: ${PREFIX}_device.log"
+
+    # Cool-down between runs
+    echo "  Cooling down 10s..."
+    sleep 10
 }
 
-# ------------------------------------------------------------------
-# Run benchmarks
-# ------------------------------------------------------------------
+# ======================================================================
+# Main: alternating runs (C→P→C→P→C→P) for fairness
+# ======================================================================
+echo "Starting alternating benchmark runs..."
 
-# 1. C++ device
-run_benchmark "device" "cpp_device"
+for i in $(seq 1 "$RUNS"); do
+    run_one "device"    "cpp"    "$i"
+    run_one "py-device" "python" "$i"
+done
 
-# 2. Python device
-run_benchmark "py-device" "python_device"
-
-# ------------------------------------------------------------------
+# ======================================================================
 # Summary
-# ------------------------------------------------------------------
-echo "=== Benchmark Complete ==="
-echo "Results in: $RESULTS_DIR/"
+# ======================================================================
 echo ""
-echo "Files:"
-ls -la "$RESULTS_DIR"/${TIMESTAMP}_*.txt
+echo "======================================"
+echo "  Benchmark Complete"
+echo "======================================"
+echo "  Results: ${RUN_DIR}/"
 echo ""
-echo "To compare, look at:"
-echo "  - CPU %: average from the csv lines"
-echo "  - Memory: MEM USAGE column"
-echo "  - FPS: from device log output"
-echo "  - Latency: from device log output"
+ls -la "${RUN_DIR}/"
+echo ""
+echo "Per run:"
+echo "  *_docker_stats.csv  — CPU%, Memory 每秒取樣"
+echo "  *_latency.csv       — 分段延遲 CSV (per-frame)"
+echo "  *_device.log        — FPS, latency log"
+echo "  *_final_stats.txt   — 最終 docker stats"
+echo ""
+echo "Analyze:"
+echo "  python benchmark_analyze.py ${RUN_DIR}"
