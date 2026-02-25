@@ -27,6 +27,25 @@
 | Startup time (s) | container 啟動到第一幀送出 | C++ 快（無 Python import chain） |
 | Steady-state allocation | heap 增長觀察 | C++ = 0 malloc |
 
+### Benchmark 初步結果（SSD MobileNet v2, FILE mode, 同機器）
+
+| 指標 | C++ | Python | 備註 |
+|---|---|---|---|
+| FPS (steady) | 9.3 | 5.9 | C++ throughput 1.58x |
+| E2E latency mean | 536 ms | 144 ms | Python 單線程無排隊延遲 |
+| E2E latency p99 | 676 ms | 231 ms | |
+| Memory (mean) | 50 MB | 58 MB | C++ 略優 |
+| CPU % (mean) | 377% | 173% | C++ 3-thread 用了 ~4 核 |
+| Jitter CV | 0.087 | 0.107 | C++ 更穩定 |
+| Tail ratio p99/p50 | 1.27x | 1.65x | C++ tail latency 更好 |
+
+**觀察**：C++ FPS 更高但 E2E 更慢，原因是 3-thread pipeline 的 ring buffer 排隊延遲。另外 C++ preprocess 異常慢（75ms vs Python 0.5ms），值得調查。
+
+### 待優化項目
+- [ ] 調查 C++ preprocess 瓶頸（OpenCV resize 在 pipeline 中的等待時間）
+- [ ] 考慮 E2E latency 計算方式是否包含了 ring buffer 等待時間，需區分 pipeline latency vs per-stage latency
+- [ ] 嘗試 YOLOv8n model 的 benchmark 比較
+
 ---
 
 ## Phase 2: C++ Pipeline Levels（2-3 天）

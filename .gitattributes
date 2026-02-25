@@ -1,0 +1,19 @@
+# Force LF line endings for shell scripts on all platforms
+*.sh text eol=lf
+
+# Other text files use native line endings
+*.py text
+*.cpp text
+*.h text
+*.cmake text
+*.proto text
+*.md text
+*.yml text
+*.yaml text
+*.txt text
+*.json text
+
+# Binary files
+*.tflite binary
+*.jpg binary
+*.png binary
