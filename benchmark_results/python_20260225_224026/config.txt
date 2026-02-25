@@ -1,0 +1,8 @@
+timestamp=20260225_224026
+agent=python
+server_addr=server:50051
+model_path=/app/models/ssd_mobilenet_v2.tflite
+hal_backend=FILE
+conf_thresh=0.4
+iou_thresh=0.45
+warmup_frames=50

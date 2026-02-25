@@ -1,0 +1,480 @@
+time="2026-02-25T22:38:41+08:00" level=warning msg="/mnt/d/hsin/side_project/sIm_edge_ai_app/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+device-1  | Loaded 80 labels
+device-1  | Frame source: FILE:/app/data/test_frames:640x480
+device-1  | INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+device-1  | Model: SSD MobileNet  input=300x300  type=uint8
+device-1  | gRPC connected to server:50051
+device-1  | [upload] thread started
+device-1  | [infer] thread started
+device-1  | Pipeline: 3 threads started (recv → infer → upload)
+device-1  | [recv] thread started
+device-1  | [upload] Benchmark CSV: /app/data/bench_cpp.csv (warmup=50)
+device-1  | [upload] Frame 1 | 2.5 FPS | 156.4 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 2 | 3.8 FPS | 149.8 ms | 0 detections   [upload] Frame 3 | 4.2 FPS | 162.5 ms | 0 detections   [upload] Frame 4 | 4.7 FPS | 160.8 ms | 0 detections   [upload] Frame 5 | 4.9 FPS | 156.0 ms | 0 detections   [upload] Frame 6 | 5.0 FPS | 162.4 ms | 0 detections   [upload] Frame 7 | 4.9 FPS | 239.4 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 8 | 5.1 FPS | 144.0 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 9 | 5.3 FPS | 156.6 ms | 0 detections   [upload] Frame 10 | 5.4 FPS | 122.8 ms | 0 detections   [upload] Frame 11 | 5.6 FPS | 114.6 ms | 0 detections   [upload] Frame 12 | 5.8 FPS | 103.9 ms | 0 detections   [upload] Frame 13 | 6.0 FPS | 97.7 ms | 0 detections   [upload] Frame 14 | 6.2 FPS | 92.7 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 15 | 6.4 FPS | 98.1 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 16 | 6.6 FPS | 94.7 ms | 0 detections   [upload] Frame 17 | 6.7 FPS | 85.4 ms | 0 detections   [upload] Frame 18 | 6.9 FPS | 99.5 ms | 0 detections   [upload] Frame 19 | 7.0 FPS | 106.0 ms | 0 detections   [upload] Frame 20 | 6.9 FPS | 156.2 ms | 0 detections   [upload] Frame 21 | 7.0 FPS | 97.5 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 22 | 7.2 FPS | 92.0 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 23 | 7.2 FPS | 97.1 ms | 0 detections   [upload] Frame 24 | 7.3 FPS | 95.3 ms | 0 detections   [upload] Frame 25 | 7.4 FPS | 88.6 ms | 0 detections   [upload] Frame 26 | 7.5 FPS | 93.6 ms | 0 detections   [upload] Frame 27 | 7.6 FPS | 106.4 ms | 0 detections   [upload] Frame 28 | 7.6 FPS | 131.6 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 29 | 7.6 FPS | 134.2 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 30 | 7.6 FPS | 132.1 ms | 0 detections   [upload] Frame 31 | 7.6 FPS | 102.4 ms | 0 detections   [upload] Frame 32 | 7.7 FPS | 92.8 ms | 0 detections   [upload] Frame 33 | 7.8 FPS | 100.2 ms | 0 detections   [upload] Frame 34 | 7.8 FPS | 97.5 ms | 0 detections   [upload] Frame 35 | 7.9 FPS | 91.5 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 36 | 7.9 FPS | 99.3 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 37 | 8.0 FPS | 88.8 ms | 0 detections   [upload] Frame 38 | 8.0 FPS | 111.2 ms | 0 detections   [upload] Frame 39 | 8.1 FPS | 96.6 ms | 0 detections   [upload] Frame 40 | 8.1 FPS | 102.5 ms | 0 detections   [upload] Frame 41 | 8.1 FPS | 101.4 ms | 0 detections   [upload] Frame 42 | 8.2 FPS | 98.8 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 43 | 8.2 FPS | 95.9 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 44 | 8.3 FPS | 90.6 ms | 0 detections   [upload] Frame 45 | 8.3 FPS | 86.4 ms | 0 detections   [upload] Frame 46 | 8.3 FPS | 106.1 ms | 0 detections   [upload] Frame 47 | 8.3 FPS | 124.6 ms | 0 detections   [upload] Frame 48 | 8.3 FPS | 110.6 ms | 0 detections   [upload] Frame 49 | 8.4 FPS | 104.3 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 50 | 8.4 FPS | 91.7 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 51 | 8.4 FPS | 100.1 ms | 0 detections   [upload] Frame 52 | 8.4 FPS | 103.0 ms | 0 detections   [upload] Frame 53 | 8.5 FPS | 104.4 ms | 0 detections   [upload] Frame 54 | 8.5 FPS | 87.9 ms | 0 detections   [upload] Frame 55 | 8.5 FPS | 86.2 ms | 0 detections   [upload] Frame 56 | 8.6 FPS | 99.5 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 57 | 8.6 FPS | 97.8 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 58 | 8.6 FPS | 107.9 ms | 0 detections   [upload] Frame 59 | 8.6 FPS | 118.6 ms | 0 detections   [upload] Frame 60 | 8.6 FPS | 102.4 ms | 0 detections   [upload] Frame 61 | 8.6 FPS | 100.9 ms | 0 detections   [upload] Frame 62 | 8.7 FPS | 101.7 ms | 0 detections   [upload] Frame 63 | 8.7 FPS | 96.1 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 64 | 8.7 FPS | 97.7 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 65 | 8.7 FPS | 90.1 ms | 0 detections   [upload] Frame 66 | 8.7 FPS | 120.5 ms | 0 detections   [upload] Frame 67 | 8.7 FPS | 120.8 ms | 0 detections   [upload] Frame 68 | 8.7 FPS | 90.1 ms | 0 detections   [upload] Frame 69 | 8.8 FPS | 103.6 ms | 0 detections   [upload] Frame 70 | 8.8 FPS | 103.4 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 71 | 8.8 FPS | 104.8 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 72 | 8.8 FPS | 91.2 ms | 0 detections   [upload] Frame 73 | 8.8 FPS | 95.3 ms | 0 detections   [upload] Frame 74 | 8.8 FPS | 89.7 ms | 0 detections   [upload] Frame 75 | 8.9 FPS | 90.4 ms | 0 detections   [upload] Frame 76 | 8.9 FPS | 98.5 ms | 0 detections   [upload] Frame 77 | 8.9 FPS | 136.6 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 78 | 8.8 FPS | 132.9 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 79 | 8.8 FPS | 112.5 ms | 0 detections   [upload] Frame 80 | 8.9 FPS | 97.5 ms | 0 detections   [upload] Frame 81 | 8.9 FPS | 113.9 ms | 0 detections   [upload] Frame 82 | 8.9 FPS | 102.4 ms | 0 detections   [upload] Frame 83 | 8.9 FPS | 96.6 ms | 0 detections   [upload] Frame 84 | 8.9 FPS | 97.3 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 85 | 8.9 FPS | 126.3 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 86 | 8.8 FPS | 152.7 ms | 0 detections   [upload] Frame 87 | 8.9 FPS | 88.0 ms | 0 detections   [upload] Frame 88 | 8.9 FPS | 99.5 ms | 0 detections   [upload] Frame 89 | 8.9 FPS | 96.4 ms | 0 detections   [upload] Frame 90 | 8.9 FPS | 116.0 ms | 0 detections   [upload] Frame 91 | 8.9 FPS | 97.6 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 92 | 8.9 FPS | 103.2 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 93 | 8.9 FPS | 105.2 ms | 0 detections   [upload] Frame 94 | 8.9 FPS | 108.3 ms | 0 detections   [upload] Frame 95 | 8.9 FPS | 96.1 ms | 0 detections   [upload] Frame 96 | 8.9 FPS | 96.8 ms | 0 detections   [upload] Frame 97 | 9.0 FPS | 98.2 ms | 0 detections   [upload] Frame 98 | 9.0 FPS | 113.6 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 99 | 9.0 FPS | 98.1 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 100 | 8.9 FPS | 149.5 ms | 0 detections   [upload] Frame 101 | 8.9 FPS | 107.8 ms | 0 detections   [upload] Frame 102 | 8.9 FPS | 94.1 ms | 0 detections   [upload] Frame 103 | 9.0 FPS | 88.0 ms | 0 detections   [upload] Frame 104 | 9.0 FPS | 126.2 ms | 0 detections   [upload] Frame 105 | 9.0 FPS | 109.3 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 106 | 9.0 FPS | 94.9 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 107 | 9.0 FPS | 88.9 ms | 0 detections   [upload] Frame 108 | 9.0 FPS | 95.0 ms | 0 detections   [upload] Frame 109 | 9.0 FPS | 89.5 ms | 0 detections   [upload] Frame 110 | 9.0 FPS | 111.4 ms | 0 detections   [upload] Frame 111 | 9.0 FPS | 89.3 ms | 0 detections   [upload] Frame 112 | 9.0 FPS | 98.1 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 113 | 9.1 FPS | 87.9 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 114 | 9.1 FPS | 99.3 ms | 0 detections   [upload] Frame 115 | 9.1 FPS | 96.7 ms | 0 detections   [upload] Frame 116 | 9.1 FPS | 104.0 ms | 0 detections   [upload] Frame 117 | 9.1 FPS | 92.7 ms | 0 detections   [upload] Frame 118 | 9.1 FPS | 102.0 ms | 0 detections   [upload] Frame 119 | 9.1 FPS | 90.2 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 120 | 9.1 FPS | 110.6 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 121 | 9.1 FPS | 95.8 ms | 0 detections   [upload] Frame 122 | 9.1 FPS | 97.3 ms | 0 detections   [upload] Frame 123 | 9.1 FPS | 99.3 ms | 0 detections   [upload] Frame 124 | 9.1 FPS | 105.3 ms | 0 detections   [upload] Frame 125 | 9.1 FPS | 143.8 ms | 0 detections   [upload] Frame 126 | 9.1 FPS | 144.0 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 127 | 9.1 FPS | 103.5 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 128 | 9.1 FPS | 109.4 ms | 0 detections   [upload] Frame 129 | 9.1 FPS | 126.1 ms | 0 detections   [upload] Frame 130 | 9.1 FPS | 106.3 ms | 0 detections   [upload] Frame 131 | 9.1 FPS | 148.3 ms | 0 detections   [upload] Frame 132 | 9.0 FPS | 156.3 ms | 0 detections   [upload] Frame 133 | 9.0 FPS | 170.3 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 134 | 9.0 FPS | 154.3 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 135 | 9.0 FPS | 124.8 ms | 0 detections   [upload] Frame 136 | 9.0 FPS | 125.2 ms | 0 detections   [upload] Frame 137 | 9.0 FPS | 104.7 ms | 0 detections   [upload] Frame 138 | 9.0 FPS | 123.4 ms | 0 detections   [upload] Frame 139 | 9.0 FPS | 107.2 ms | 0 detections   [upload] Frame 140 | 9.0 FPS | 117.2 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 141 | 9.0 FPS | 110.1 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 142 | 9.0 FPS | 100.5 ms | 0 detections   [upload] Frame 143 | 9.0 FPS | 107.2 ms | 0 detections   [upload] Frame 144 | 9.0 FPS | 103.7 ms | 0 detections   [upload] Frame 145 | 9.0 FPS | 98.8 ms | 0 detections   [upload] Frame 146 | 9.0 FPS | 104.1 ms | 0 detections   [upload] Frame 147 | 9.0 FPS | 101.7 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 148 | 9.0 FPS | 96.2 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 149 | 9.0 FPS | 94.8 ms | 0 detections   [upload] Frame 150 | 9.0 FPS | 95.3 ms | 0 detections   [upload] Frame 151 | 9.0 FPS | 108.4 ms | 0 detections   [upload] Frame 152 | 9.0 FPS | 88.0 ms | 0 detections   [upload] Frame 153 | 9.0 FPS | 99.5 ms | 0 detections   [upload] Frame 154 | 9.0 FPS | 101.4 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 155 | 9.0 FPS | 99.9 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 156 | 9.0 FPS | 107.5 ms | 0 detections   [upload] Frame 157 | 9.0 FPS | 93.6 ms | 0 detections   [upload] Frame 158 | 9.1 FPS | 102.8 ms | 0 detections   [upload] Frame 159 | 9.1 FPS | 97.9 ms | 0 detections   [upload] Frame 160 | 9.1 FPS | 96.4 ms | 0 detections   [upload] Frame 161 | 9.1 FPS | 89.1 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 162 | 9.1 FPS | 92.8 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 163 | 9.1 FPS | 92.8 ms | 0 detections   [upload] Frame 164 | 9.1 FPS | 99.4 ms | 0 detections   [upload] Frame 165 | 9.1 FPS | 92.0 ms | 0 detections   [upload] Frame 166 | 9.1 FPS | 93.2 ms | 0 detections   [upload] Frame 167 | 9.1 FPS | 110.7 ms | 0 detections   [upload] Frame 168 | 9.1 FPS | 94.2 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 169 | 9.1 FPS | 92.5 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 170 | 9.1 FPS | 104.8 ms | 0 detections   [upload] Frame 171 | 9.1 FPS | 93.0 ms | 0 detections   [upload] Frame 172 | 9.1 FPS | 105.0 ms | 0 detections   [upload] Frame 173 | 9.1 FPS | 95.5 ms | 0 detections   [upload] Frame 174 | 9.2 FPS | 98.8 ms | 0 detections   [upload] Frame 175 | 9.2 FPS | 97.6 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 176 | 9.2 FPS | 107.3 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 177 | 9.2 FPS | 113.3 ms | 0 detections   [upload] Frame 178 | 9.2 FPS | 96.1 ms | 0 detections   [upload] Frame 179 | 9.2 FPS | 103.8 ms | 0 detections   [upload] Frame 180 | 9.1 FPS | 152.0 ms | 0 detections   [upload] Frame 181 | 9.1 FPS | 127.3 ms | 0 detections   [upload] Frame 182 | 9.1 FPS | 101.4 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 183 | 9.1 FPS | 96.4 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 184 | 9.2 FPS | 101.5 ms | 0 detections   [upload] Frame 185 | 9.2 FPS | 107.2 ms | 0 detections   [upload] Frame 186 | 9.2 FPS | 112.6 ms | 0 detections   [upload] Frame 187 | 9.1 FPS | 116.6 ms | 0 detections   [upload] Frame 188 | 9.2 FPS | 96.8 ms | 0 detections   [upload] Frame 189 | 9.2 FPS | 96.4 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 190 | 9.2 FPS | 96.8 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 191 | 9.2 FPS | 94.4 ms | 0 detections   [upload] Frame 192 | 9.2 FPS | 97.3 ms | 0 detections   [upload] Frame 193 | 9.2 FPS | 105.8 ms | 0 detections   [upload] Frame 194 | 9.2 FPS | 91.3 ms | 0 detections   [upload] Frame 195 | 9.2 FPS | 101.1 ms | 0 detections   [upload] Frame 196 | 9.2 FPS | 123.4 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 197 | 9.2 FPS | 114.3 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 198 | 9.2 FPS | 90.6 ms | 0 detections   [upload] Frame 199 | 9.2 FPS | 92.5 ms | 0 detections   [upload] Frame 200 | 9.2 FPS | 91.6 ms | 0 detections   [upload] Frame 201 | 9.2 FPS | 104.7 ms | 0 detections   [upload] Frame 202 | 9.2 FPS | 105.2 ms | 0 detections   [upload] Frame 203 | 9.2 FPS | 97.1 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 204 | 9.2 FPS | 109.4 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 205 | 9.2 FPS | 98.7 ms | 0 detections   [upload] Frame 206 | 9.2 FPS | 100.2 ms | 0 detections   [upload] Frame 207 | 9.2 FPS | 101.2 ms | 0 detections   [upload] Frame 208 | 9.2 FPS | 91.3 ms | 0 detections   [upload] Frame 209 | 9.2 FPS | 95.2 ms | 0 detections   [upload] Frame 210 | 9.2 FPS | 91.6 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 211 | 9.2 FPS | 102.3 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 212 | 9.2 FPS | 102.3 ms | 0 detections   [upload] Frame 213 | 9.2 FPS | 99.9 ms | 0 detections   [upload] Frame 214 | 9.3 FPS | 91.3 ms | 0 detections   [upload] Frame 215 | 9.3 FPS | 106.0 ms | 0 detections   [upload] Frame 216 | 9.3 FPS | 113.5 ms | 0 detections   [upload] Frame 217 | 9.3 FPS | 90.1 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 218 | 9.3 FPS | 106.7 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 219 | 9.3 FPS | 97.1 ms | 0 detections   [upload] Frame 220 | 9.3 FPS | 100.0 ms | 0 detections   [upload] Frame 221 | 9.3 FPS | 101.4 ms | 0 detections   [upload] Frame 222 | 9.3 FPS | 87.2 ms | 0 detections   [upload] Frame 223 | 9.3 FPS | 97.1 ms | 0 detections   [upload] Frame 224 | 9.3 FPS | 91.8 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 225 | 9.3 FPS | 104.9 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 226 | 9.3 FPS | 113.2 ms | 0 detections   [upload] Frame 227 | 9.3 FPS | 87.6 ms | 0 detections   [upload] Frame 228 | 9.3 FPS | 90.8 ms | 0 detections   [upload] Frame 229 | 9.3 FPS | 91.1 ms | 0 detections   [upload] Frame 230 | 9.3 FPS | 97.6 ms | 0 detections   [upload] Frame 231 | 9.3 FPS | 97.5 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 232 | 9.3 FPS | 103.0 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 233 | 9.3 FPS | 106.2 ms | 0 detections   [upload] Frame 234 | 9.3 FPS | 99.0 ms | 0 detections   [upload] Frame 235 | 9.3 FPS | 101.3 ms | 0 detections   [upload] Frame 236 | 9.3 FPS | 93.5 ms | 0 detections   [upload] Frame 237 | 9.3 FPS | 112.0 ms | 0 detections   [upload] Frame 238 | 9.3 FPS | 95.4 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 239 | 9.3 FPS | 85.5 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 240 | 9.3 FPS | 95.4 ms | 0 detections   [upload] Frame 241 | 9.3 FPS | 91.7 ms | 0 detections   [upload] Frame 242 | 9.4 FPS | 94.7 ms | 0 detections   [upload] Frame 243 | 9.4 FPS | 92.2 ms | 0 detections   [upload] Frame 244 | 9.4 FPS | 92.7 ms | 0 detections   [upload] Frame 245 | 9.4 FPS | 93.7 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 246 | 9.4 FPS | 97.6 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 247 | 9.4 FPS | 103.1 ms | 0 detections   [upload] Frame 248 | 9.4 FPS | 114.7 ms | 0 detections   [upload] Frame 249 | 9.4 FPS | 91.5 ms | 0 detections   [upload] Frame 250 | 9.4 FPS | 98.5 ms | 0 detections   [upload] Frame 251 | 9.4 FPS | 95.6 ms | 0 detections   [upload] Frame 252 | 9.4 FPS | 93.6 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 253 | 9.4 FPS | 93.2 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 254 | 9.4 FPS | 96.8 ms | 0 detections   [upload] Frame 255 | 9.4 FPS | 90.8 ms | 0 detections   [upload] Frame 256 | 9.4 FPS | 95.3 ms | 0 detections   [upload] Frame 257 | 9.4 FPS | 86.5 ms | 0 detections   [upload] Frame 258 | 9.4 FPS | 105.5 ms | 0 detections   [upload] Frame 259 | 9.4 FPS | 97.7 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 260 | 9.4 FPS | 105.3 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 261 | 9.4 FPS | 101.8 ms | 0 detections   [upload] Frame 262 | 9.4 FPS | 108.0 ms | 0 detections   [upload] Frame 263 | 9.4 FPS | 88.8 ms | 0 detections   [upload] Frame 264 | 9.4 FPS | 101.9 ms | 0 detections   [upload] Frame 265 | 9.4 FPS | 90.3 ms | 0 detections   [upload] Frame 266 | 9.4 FPS | 98.8 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 267 | 9.4 FPS | 91.4 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 268 | 9.4 FPS | 108.1 ms | 0 detections   [upload] Frame 269 | 9.4 FPS | 98.7 ms | 0 detections   [upload] Frame 270 | 9.4 FPS | 105.1 ms | 0 detections   [upload] Frame 271 | 9.4 FPS | 99.9 ms | 0 detections   [upload] Frame 272 | 9.4 FPS | 95.2 ms | 0 detections   [upload] Frame 273 | 9.4 FPS | 96.2 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 274 | 9.4 FPS | 95.2 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 275 | 9.4 FPS | 100.3 ms | 0 detections   [upload] Frame 276 | 9.4 FPS | 97.9 ms | 0 detections   [upload] Frame 277 | 9.5 FPS | 93.8 ms | 0 detections   [upload] Frame 278 | 9.5 FPS | 91.0 ms | 0 detections   [upload] Frame 279 | 9.5 FPS | 111.0 ms | 0 detections   [upload] Frame 280 | 9.5 FPS | 94.8 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 281 | 9.4 FPS | 163.6 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 282 | 9.4 FPS | 115.1 ms | 0 detections   [upload] Frame 283 | 9.4 FPS | 89.8 ms | 0 detections   [upload] Frame 284 | 9.4 FPS | 96.4 ms | 0 detections   [upload] Frame 285 | 9.4 FPS | 95.8 ms | 0 detections   [upload] Frame 286 | 9.4 FPS | 110.6 ms | 0 detections   [upload] Frame 287 | 9.4 FPS | 120.1 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 288 | 9.4 FPS | 111.9 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 289 | 9.4 FPS | 112.9 ms | 0 detections   [upload] Frame 290 | 9.4 FPS | 89.4 ms | 0 detections   [upload] Frame 291 | 9.4 FPS | 97.6 ms | 0 detections   [upload] Frame 292 | 9.4 FPS | 99.1 ms | 0 detections   [upload] Frame 293 | 9.5 FPS | 95.8 ms | 0 detections   [upload] Frame 294 | 9.5 FPS | 107.1 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 295 | 9.5 FPS | 88.5 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 296 | 9.5 FPS | 87.8 ms | 0 detections   [upload] Frame 297 | 9.5 FPS | 94.0 ms | 0 detections   [upload] Frame 298 | 9.5 FPS | 98.2 ms | 0 detections   [upload] Frame 299 | 9.5 FPS | 124.5 ms | 0 detections   [upload] Frame 300 | 9.5 FPS | 107.7 ms | 0 detections   [upload] Frame 301 | 9.5 FPS | 89.5 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 302 | 9.5 FPS | 94.0 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 303 | 9.5 FPS | 101.0 ms | 0 detections   [upload] Frame 304 | 9.5 FPS | 89.8 ms | 0 detections   [upload] Frame 305 | 9.5 FPS | 86.6 ms | 0 detections   [upload] Frame 306 | 9.5 FPS | 99.1 ms | 0 detections   [upload] Frame 307 | 9.5 FPS | 103.1 ms | 0 detections   [upload] Frame 308 | 9.5 FPS | 127.1 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 309 | 9.5 FPS | 117.2 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 310 | 9.5 FPS | 95.7 ms | 0 detections   [upload] Frame 311 | 9.5 FPS | 85.7 ms | 0 detections   [upload] Frame 312 | 9.5 FPS | 91.1 ms | 0 detections   [upload] Frame 313 | 9.5 FPS | 91.7 ms | 0 detections   [upload] Frame 314 | 9.5 FPS | 91.6 ms | 0 detections   [upload] Frame 315 | 9.5 FPS | 86.7 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 316 | 9.5 FPS | 88.4 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 317 | 9.5 FPS | 105.6 ms | 0 detections   [upload] Frame 318 | 9.5 FPS | 93.3 ms | 0 detections   [upload] Frame 319 | 9.5 FPS | 111.2 ms | 0 detections   [upload] Frame 320 | 9.5 FPS | 102.6 ms | 0 detections   [upload] Frame 321 | 9.5 FPS | 89.3 ms | 0 detections   [upload] Frame 322 | 9.5 FPS | 97.8 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 323 | 9.5 FPS | 90.9 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 324 | 9.5 FPS | 102.1 ms | 0 detections   [upload] Frame 325 | 9.5 FPS | 86.3 ms | 0 detections   [upload] Frame 326 | 9.5 FPS | 108.7 ms | 0 detections   [upload] Frame 327 | 9.5 FPS | 91.7 ms | 0 detections   [upload] Frame 328 | 9.5 FPS | 96.9 ms | 0 detections   [upload] Frame 329 | 9.5 FPS | 108.4 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 330 | 9.5 FPS | 105.6 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 331 | 9.5 FPS | 96.2 ms | 0 detections   [upload] Frame 332 | 9.5 FPS | 87.4 ms | 0 detections   [upload] Frame 333 | 9.5 FPS | 95.3 ms | 0 detections   [upload] Frame 334 | 9.5 FPS | 93.5 ms | 0 detections   [upload] Frame 335 | 9.5 FPS | 91.1 ms | 0 detections   [upload] Frame 336 | 9.5 FPS | 95.7 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 337 | 9.5 FPS | 96.6 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 338 | 9.5 FPS | 113.9 ms | 0 detections   [upload] Frame 339 | 9.5 FPS | 110.3 ms | 0 detections   [upload] Frame 340 | 9.5 FPS | 109.5 ms | 0 detections   [upload] Frame 341 | 9.5 FPS | 110.2 ms | 0 detections   [upload] Frame 342 | 9.5 FPS | 95.2 ms | 0 detections   [upload] Frame 343 | 9.5 FPS | 108.1 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 344 | 9.5 FPS | 118.1 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 345 | 9.5 FPS | 104.6 ms | 0 detections   [upload] Frame 346 | 9.5 FPS | 110.2 ms | 0 detections   [upload] Frame 347 | 9.5 FPS | 103.6 ms | 0 detections   [upload] Frame 348 | 9.5 FPS | 124.0 ms | 0 detections   [upload] Frame 349 | 9.5 FPS | 119.5 ms | 0 detections   [upload] Frame 350 | 9.5 FPS | 110.1 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 351 | 9.5 FPS | 122.3 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 352 | 9.5 FPS | 101.1 ms | 0 detections   [upload] Frame 353 | 9.5 FPS | 98.6 ms | 0 detections   [upload] Frame 354 | 9.5 FPS | 89.3 ms | 0 detections   [upload] Frame 355 | 9.5 FPS | 93.4 ms | 0 detections   [upload] Frame 356 | 9.5 FPS | 90.8 ms | 0 detections   [upload] Frame 357 | 9.5 FPS | 97.9 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 358 | 9.5 FPS | 98.3 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 359 | 9.5 FPS | 104.9 ms | 0 detections   [upload] Frame 360 | 9.5 FPS | 95.6 ms | 0 detections   [upload] Frame 361 | 9.5 FPS | 107.0 ms | 0 detections   [upload] Frame 362 | 9.5 FPS | 96.0 ms | 0 detections   [upload] Frame 363 | 9.5 FPS | 93.4 ms | 0 detections   [upload] Frame 364 | 9.5 FPS | 101.9 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 365 | 9.5 FPS | 110.4 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 366 | 9.5 FPS | 117.9 ms | 0 detections   [upload] Frame 367 | 9.5 FPS | 112.4 ms | 0 detections   [upload] Frame 368 | 9.5 FPS | 118.8 ms | 0 detections   [upload] Frame 369 | 9.5 FPS | 128.2 ms | 0 detections   [upload] Frame 370 | 9.5 FPS | 117.9 ms | 0 detections   [upload] Frame 371 | 9.5 FPS | 111.1 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 372 | 9.5 FPS | 118.9 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 373 | 9.5 FPS | 107.0 ms | 0 detections   [upload] Frame 374 | 9.5 FPS | 106.0 ms | 0 detections   [upload] Frame 375 | 9.5 FPS | 125.1 ms | 0 detections   [upload] Frame 376 | 9.5 FPS | 119.5 ms | 0 detections   [upload] Frame 377 | 9.5 FPS | 157.2 ms | 0 detections   [upload] Frame 378 | 9.5 FPS | 172.8 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 379 | 9.5 FPS | 107.4 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 380 | 9.5 FPS | 108.5 ms | 0 detections   [upload] Frame 381 | 9.5 FPS | 113.4 ms | 0 detections   [upload] Frame 382 | 9.5 FPS | 107.4 ms | 0 detections   [upload] Frame 383 | 9.5 FPS | 121.8 ms | 0 detections   [upload] Frame 384 | 9.5 FPS | 88.6 ms | 0 detections   [upload] Frame 385 | 9.5 FPS | 92.8 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 386 | 9.5 FPS | 118.9 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 387 | 9.5 FPS | 91.3 ms | 0 detections   [upload] Frame 388 | 9.5 FPS | 86.2 ms | 0 detections   [upload] Frame 389 | 9.5 FPS | 107.4 ms | 0 detections   [upload] Frame 390 | 9.5 FPS | 97.8 ms | 0 detections   [upload] Frame 391 | 9.5 FPS | 90.7 ms | 0 detections   [upload] Frame 392 | 9.5 FPS | 97.4 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 393 | 9.5 FPS | 92.1 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 394 | 9.5 FPS | 91.0 ms | 0 detections   [upload] Frame 395 | 9.5 FPS | 98.8 ms | 0 detections   [upload] Frame 396 | 9.5 FPS | 108.0 ms | 0 detections   [upload] Frame 397 | 9.5 FPS | 124.8 ms | 0 detections   [upload] Frame 398 | 9.5 FPS | 99.9 ms | 0 detections   [upload] Frame 399 | 9.5 FPS | 101.9 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 400 | 9.5 FPS | 91.0 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 401 | 9.5 FPS | 117.3 ms | 0 detections   [upload] Frame 402 | 9.5 FPS | 85.9 ms | 0 detections   [upload] Frame 403 | 9.5 FPS | 96.1 ms | 0 detections   [upload] Frame 404 | 9.5 FPS | 91.9 ms | 0 detections   [upload] Frame 405 | 9.5 FPS | 94.0 ms | 0 detections   [upload] Frame 406 | 9.5 FPS | 97.4 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 407 | 9.5 FPS | 102.5 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 408 | 9.5 FPS | 107.4 ms | 0 detections   [upload] Frame 409 | 9.5 FPS | 103.6 ms | 0 detections   [upload] Frame 410 | 9.5 FPS | 88.6 ms | 0 detections   [upload] Frame 411 | 9.5 FPS | 102.8 ms | 0 detections   [upload] Frame 412 | 9.5 FPS | 97.1 ms | 0 detections   [upload] Frame 413 | 9.5 FPS | 92.0 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 414 | 9.5 FPS | 101.8 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 415 | 9.5 FPS | 93.8 ms | 0 detections   [upload] Frame 416 | 9.5 FPS | 95.6 ms | 0 detections   [upload] Frame 417 | 9.5 FPS | 104.5 ms | 0 detections   [upload] Frame 418 | 9.5 FPS | 97.4 ms | 0 detections   [upload] Frame 419 | 9.5 FPS | 103.0 ms | 0 detections   [upload] Frame 420 | 9.5 FPS | 100.8 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 421 | 9.5 FPS | 90.4 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 422 | 9.5 FPS | 105.2 ms | 0 detections   [upload] Frame 423 | 9.5 FPS | 103.0 ms | 0 detections   [upload] Frame 424 | 9.5 FPS | 89.7 ms | 0 detections   [upload] Frame 425 | 9.5 FPS | 104.8 ms | 0 detections   [upload] Frame 426 | 9.5 FPS | 96.8 ms | 0 detections   [upload] Frame 427 | 9.5 FPS | 113.8 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 428 | 9.5 FPS | 93.1 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 429 | 9.5 FPS | 96.5 ms | 0 detections   [upload] Frame 430 | 9.5 FPS | 89.9 ms | 0 detections   [upload] Frame 431 | 9.5 FPS | 97.8 ms | 0 detections   [upload] Frame 432 | 9.5 FPS | 97.5 ms | 0 detections   [upload] Frame 433 | 9.5 FPS | 106.8 ms | 0 detections   [upload] Frame 434 | 9.5 FPS | 93.3 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 435 | 9.6 FPS | 89.8 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 436 | 9.6 FPS | 98.2 ms | 0 detections   [upload] Frame 437 | 9.6 FPS | 98.0 ms | 0 detections   [upload] Frame 438 | 9.6 FPS | 112.8 ms | 0 detections   [upload] Frame 439 | 9.6 FPS | 109.7 ms | 0 detections   [upload] Frame 440 | 9.6 FPS | 95.9 ms | 0 detections   [upload] Frame 441 | 9.6 FPS | 105.1 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 442 | 9.6 FPS | 89.6 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 443 | 9.6 FPS | 97.7 ms | 0 detections   [upload] Frame 444 | 9.6 FPS | 88.8 ms | 0 detections   [upload] Frame 445 | 9.6 FPS | 95.0 ms | 0 detections   [upload] Frame 446 | 9.6 FPS | 96.7 ms | 0 detections   [upload] Frame 447 | 9.6 FPS | 96.7 ms | 0 detections   [upload] Frame 448 | 9.6 FPS | 107.1 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 449 | 9.6 FPS | 104.0 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 450 | 9.6 FPS | 99.9 ms | 0 detections   [upload] Frame 451 | 9.6 FPS | 97.3 ms | 0 detections   [upload] Frame 452 | 9.6 FPS | 88.2 ms | 0 detections   [upload] Frame 453 | 9.6 FPS | 101.5 ms | 0 detections   [upload] Frame 454 | 9.6 FPS | 97.3 ms | 0 detections   [upload] Frame 455 | 9.6 FPS | 99.4 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 456 | 9.6 FPS | 91.0 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 457 | 9.6 FPS | 93.3 ms | 0 detections   [upload] Frame 458 | 9.6 FPS | 103.1 ms | 0 detections   [upload] Frame 459 | 9.6 FPS | 108.6 ms | 0 detections   [upload] Frame 460 | 9.6 FPS | 88.2 ms | 0 detections   [upload] Frame 461 | 9.6 FPS | 93.9 ms | 0 detections   [upload] Frame 462 | 9.6 FPS | 91.2 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 463 | 9.6 FPS | 103.4 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 464 | 9.6 FPS | 86.9 ms | 0 detections   [upload] Frame 465 | 9.6 FPS | 96.5 ms | 0 detections   [upload] Frame 466 | 9.6 FPS | 96.5 ms | 0 detections   [upload] Frame 467 | 9.6 FPS | 96.9 ms | 0 detections   [upload] Frame 468 | 9.6 FPS | 97.8 ms | 0 detections   [upload] Frame 469 | 9.6 FPS | 108.5 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 470 | 9.6 FPS | 108.7 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 471 | 9.6 FPS | 98.7 ms | 0 detections   [upload] Frame 472 | 9.6 FPS | 89.6 ms | 0 detections   [upload] Frame 473 | 9.6 FPS | 95.9 ms | 0 detections   [upload] Frame 474 | 9.6 FPS | 95.5 ms | 0 detections   [upload] Frame 475 | 9.6 FPS | 95.3 ms | 0 detections   [upload] Frame 476 | 9.6 FPS | 104.1 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 477 | 9.6 FPS | 88.8 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 478 | 9.6 FPS | 182.6 ms | 0 detections   [upload] Frame 479 | 9.6 FPS | 108.5 ms | 0 detections   [upload] Frame 480 | 9.6 FPS | 99.4 ms | 0 detections   [upload] Frame 481 | 9.6 FPS | 107.5 ms | 0 detections   [upload] Frame 482 | 9.6 FPS | 89.9 ms | 0 detections   [upload] Frame 483 | 9.6 FPS | 92.9 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 484 | 9.6 FPS | 101.7 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 485 | 9.6 FPS | 89.9 ms | 0 detections   [upload] Frame 486 | 9.6 FPS | 88.0 ms | 0 detections   [upload] Frame 487 | 9.6 FPS | 92.5 ms | 0 detections   [upload] Frame 488 | 9.6 FPS | 100.9 ms | 0 detections   [upload] Frame 489 | 9.6 FPS | 123.7 ms | 0 detections   [upload] Frame 490 | 9.6 FPS | 115.3 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 491 | 9.6 FPS | 93.2 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 492 | 9.6 FPS | 102.5 ms | 0 detections   [upload] Frame 493 | 9.6 FPS | 96.2 ms | 0 detections   [upload] Frame 494 | 9.6 FPS | 94.2 ms | 0 detections   [upload] Frame 495 | 9.6 FPS | 94.2 ms | 0 detections   [upload] Frame 496 | 9.6 FPS | 94.3 ms | 0 detections   [upload] Frame 497 | 9.6 FPS | 92.7 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 498 | 9.6 FPS | 89.5 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 499 | 9.6 FPS | 111.5 ms | 0 detections   [upload] Frame 500 | 9.6 FPS | 94.5 ms | 0 detections   [upload] Frame 501 | 9.6 FPS | 103.3 ms | 0 detections   [upload] Frame 502 | 9.6 FPS | 101.9 ms | 0 detections   [upload] Frame 503 | 9.6 FPS | 99.3 ms | 0 detections   [upload] Frame 504 | 9.6 FPS | 104.7 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 505 | 9.6 FPS | 102.5 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 506 | 9.6 FPS | 102.6 ms | 0 detections   [upload] Frame 507 | 9.6 FPS | 98.5 ms | 0 detections   [upload] Frame 508 | 9.6 FPS | 101.7 ms | 0 detections   [upload] Frame 509 | 9.6 FPS | 111.3 ms | 0 detections   [upload] Frame 510 | 9.6 FPS | 103.1 ms | 0 detections   [upload] Frame 511 | 9.6 FPS | 96.3 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 512 | 9.6 FPS | 101.4 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 513 | 9.6 FPS | 101.0 ms | 0 detections   [upload] Frame 514 | 9.6 FPS | 103.1 ms | 0 detections   [upload] Frame 515 | 9.6 FPS | 95.9 ms | 0 detections   [upload] Frame 516 | 9.6 FPS | 100.4 ms | 0 detections   [upload] Frame 517 | 9.6 FPS | 97.4 ms | 0 detections   [upload] Frame 518 | 9.6 FPS | 101.8 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 519 | 9.6 FPS | 107.2 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 520 | 9.6 FPS | 102.6 ms | 0 detections   [upload] Frame 521 | 9.6 FPS | 96.9 ms | 0 detections   [upload] Frame 522 | 9.6 FPS | 89.7 ms | 0 detections   [upload] Frame 523 | 9.6 FPS | 95.1 ms | 0 detections   [upload] Frame 524 | 9.6 FPS | 99.0 ms | 0 detections   [upload] Frame 525 | 9.6 FPS | 98.1 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 526 | 9.6 FPS | 116.7 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 527 | 9.6 FPS | 87.4 ms | 0 detections   [upload] Frame 528 | 9.6 FPS | 96.9 ms | 0 detections   [upload] Frame 529 | 9.6 FPS | 97.6 ms | 0 detections   [upload] Frame 530 | 9.6 FPS | 109.6 ms | 0 detections   [upload] Frame 531 | 9.6 FPS | 109.0 ms | 0 detections   [upload] Frame 532 | 9.6 FPS | 100.1 ms | 2 detections   
+device-1  |   [person] 0.91 (0.101,0.264)-(0.837,1.000)
+device-1  |   [person] 0.87 (0.582,0.074)-(0.892,1.005)[upload] Frame 533 | 9.6 FPS | 94.1 ms | 4 detections   
+device-1  |   [person] 0.98 (0.065,0.374)-(0.299,0.834)
+device-1  |   [bus] 0.89 (0.034,0.203)-(1.007,0.687)
+device-1  |   [person] 0.77 (0.279,0.355)-(0.418,0.786)
+device-1  |   [person] 0.44 (0.837,0.334)-(1.000,0.820)[upload] Frame 534 | 9.6 FPS | 100.7 ms | 0 detections   [upload] Frame 535 | 9.6 FPS | 100.5 ms | 0 detections   [upload] Frame 536 | 9.6 FPS | 133.4 ms | 0 detections   [upload] Frame 537 | 9.6 FPS | 117.5 ms | 0 detections   [upload] Frame 538 | 9.6 FPS | 122.1 ms | 0 detections   [recv] thread exiting (frames read: 542)
+device-1  | 
+device-1  | [upload] Benchmark CSV saved
+device-1  | 
+device-1  | [upload] thread exiting (frames uploaded: 538)
+device-1  | [infer] thread exiting (frames processed: 538)
+device-1  | Pipeline: all threads joined
+device-1  | 
+device-1  | Done.
