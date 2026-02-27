@@ -21,8 +21,13 @@ Portfolio project targeting Google Taiwan new grad SWE (Home/Nest/ChromeOS/Cloud
 - HAL pattern: `IFrameSource` interface. Currently `FileFrameSource` (reads JPEGs). Future: `V4L2FrameSource`, `OpenCVFrameSource`, `ShmFrameSource`
 - Compile-time HAL switching via CMake flag: `cmake -DHAL_CAMERA_BACKEND=FILE|V4L2|OPENCV|SHM ..`
 - Hand-written NMS (`compute_iou` + `nms_filter`) — not using any framework's built-in postprocess; IoU threshold controlled via `IOU_THRESH` env var
-- 3-thread pipeline: recv → RingBuffer A → infer → RingBuffer B → upload (POSIX semaphores + pthread_mutex, SPSC, 4 slots each)
-- Zero malloc in steady state for recv/infer threads; upload thread has small JPEG encode + protobuf allocs (I/O-bound, acceptable)
+- Pipeline Level system (0-4), compile-time switch via CMake `-DPIPELINE_LEVEL=N`:
+  - **L0**: single-threaded blocking loop, `std::vector` heap alloc per frame
+  - **L1**: 3x `std::thread` + `ThreadSafeQueue` (unbounded `std::queue` + mutex + cond_var)
+  - **L2**: 3x `pthread_create` + `PosixQueue` (bounded `sem_t` + `pthread_mutex_t`, capacity=8)
+  - **L3**: 3x `pthread` + `RingBuffer` + pre-allocated slots, `resize()` → `memcpy` (temporary alloc)
+  - **L4** (default): 3x `pthread` + `RingBuffer` + `resize_into()` direct write (true zero-copy)
+- Zero malloc in steady state for recv/infer threads (L4 only); upload thread has small JPEG encode + protobuf allocs (I/O-bound, acceptable)
 - TFLite C++ API (not C API); auto-detects model type at runtime:
   - `SSD_MOBILENET`: 4 output tensors (post-NMS from model), uint8 input, 300x300
   - `YOLOV8`: 1 output tensor `[1, 4+num_classes, num_anchors]`, float32 input, 640x640; C++ NMS applied
@@ -43,7 +48,7 @@ device/
   CMakeLists.txt             # TFLite from /tf source dir, gRPC via pkg-config
   Dockerfile                 # Multi-stage: builder (compile TFLite ~15min) → runtime
   hal/                       # IFrameSource interface + FileFrameSource
-  src/                       # main.cpp, pipeline, ring_buffer, preprocess, inference, postprocess(NMS), grpc_client, labels
+  src/                       # main.cpp, pipeline (L0-L4), ring_buffer, preprocess, inference, postprocess(NMS), grpc_client, labels
 server/
   Dockerfile                 # Generates proto Python stubs at build time
   app/main.py                # NiceGUI dashboard (@ui.page + FastAPI endpoints)
@@ -83,6 +88,18 @@ pip install ultralytics
 python models/export_yolov8n.py        # Exports models/yolov8n_float32.tflite
 MODEL_PATH=/app/models/yolov8n_float32.tflite \
 LABELS_PATH=/app/models/coco80_labels.txt \
+docker compose up --build
+```
+
+## Build with Different Pipeline Levels
+```bash
+# Level 0 (single-threaded, simplest)
+PIPELINE_LEVEL=0 docker compose build device
+
+# Level 2 (pthread + bounded queue)
+PIPELINE_LEVEL=2 docker compose up --build device
+
+# Default is Level 4 (full production)
 docker compose up --build
 ```
 
@@ -127,6 +144,7 @@ python -m grpc_tools.protoc -I proto --python_out=server --grpc_python_out=serve
 | `IOU_THRESH` | `0.45` | NMS IoU threshold (higher = more overlapping boxes kept) |
 | `CAM_INDEX` | `0` | Camera device index for OPENCV backend (`/dev/videoN`) |
 | `HAL_CAMERA_BACKEND` | `FILE` | Compile-time HAL switch: `FILE` or `OPENCV` |
+| `PIPELINE_LEVEL` | `4` | Compile-time pipeline level: 0 (single-thread) to 4 (full production) |
 
 ## Current Status
 - All source files written, not yet tested end-to-end
@@ -147,3 +165,4 @@ python -m grpc_tools.protoc -I proto --python_out=server --grpc_python_out=serve
 10. Kernel module (ml_stats.ko), bpftrace, QEMU ARM64 (bonus items)
 11. ✅ NiceGUI dashboard migration (FastAPI + WebSocket, ECharts, dark mode, device status)
 12. Prometheus + Grafana (supplements NiceGUI dashboard via FastAPI endpoints)
+13. ✅ Pipeline Levels 0-3 (progressive optimization showcase, compile-time switch)

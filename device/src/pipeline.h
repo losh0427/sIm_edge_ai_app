@@ -25,14 +25,6 @@ public:
     void request_shutdown();
 
 private:
-    static void* recv_entry(void* arg);
-    static void* infer_entry(void* arg);
-    static void* upload_entry(void* arg);
-
-    void recv_loop();
-    void infer_loop();
-    void upload_loop();
-
     struct Impl;
     Impl* impl_ = nullptr;
 };

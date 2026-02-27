@@ -26,8 +26,10 @@ COPY device/ /app/device/
 # Build edge agent
 WORKDIR /app/device/build
 ARG HAL_CAMERA_BACKEND=FILE
+ARG PIPELINE_LEVEL=4
 RUN cmake -DTFLITE_SOURCE_DIR=/tf -DCMAKE_BUILD_TYPE=Release \
-          -DHAL_CAMERA_BACKEND=${HAL_CAMERA_BACKEND} .. && \
+          -DHAL_CAMERA_BACKEND=${HAL_CAMERA_BACKEND} \
+          -DPIPELINE_LEVEL=${PIPELINE_LEVEL} .. && \
     cmake --build . -j$(nproc)
 
 # Runtime stage

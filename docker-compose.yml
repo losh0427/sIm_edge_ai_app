@@ -21,6 +21,7 @@ services:
       dockerfile: device/Dockerfile
       args:
         - HAL_CAMERA_BACKEND=${HAL_CAMERA_BACKEND:-FILE}
+        - PIPELINE_LEVEL=${PIPELINE_LEVEL:-4}
     environment:
       - SERVER_ADDR=${SERVER_ADDR:-server:50051}
       - EDGE_ID=edge-1

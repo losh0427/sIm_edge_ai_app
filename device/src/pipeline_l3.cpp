@@ -1,5 +1,10 @@
-// Level 4: Full production pipeline — 3x pthread + RingBuffer + pre-allocated slots + zero-malloc
-// recv uses resize_into() to write directly into slot buffer (true zero-copy)
+// Level 3: 3x pthread + RingBuffer + pre-allocated slots — resize() then memcpy
+// Uses ring_buffer.h + pipeline_slots.h (same as Level 4).
+// Key difference from Level 4: recv uses preprocess::resize() which returns
+// std::vector (temporary heap alloc), then memcpy into slot.
+// Level 4's resize_into() writes directly into slot buffer (true zero-copy).
+// This demonstrates that pre-allocated buffers alone aren't enough — the API
+// must support in-place writes to achieve true zero-malloc in steady state.
 
 #include "src/pipeline.h"
 #include "src/ring_buffer.h"
@@ -30,14 +35,14 @@ struct Pipeline::Impl {
     pthread_t upload_tid;
     bool threads_started = false;
 
-    // ── static entry points (C-style for pthread_create) ──
     static void* recv_entry(void* arg)   { static_cast<Impl*>(arg)->recv_loop(); return nullptr; }
     static void* infer_entry(void* arg)  { static_cast<Impl*>(arg)->infer_loop(); return nullptr; }
     static void* upload_entry(void* arg) { static_cast<Impl*>(arg)->upload_loop(); return nullptr; }
 
     // ── Thread 1: recv loop ──
+    // Key difference from L4: uses resize() → memcpy instead of resize_into()
     void recv_loop() {
-        fprintf(stderr, "[recv] thread started\n");
+        fprintf(stderr, "[recv] thread started (L3: resize+memcpy into slot)\n");
         auto& cfg = config;
         int frame_num = 0;
 
@@ -59,16 +64,17 @@ struct Pipeline::Impl {
             frame_num++;
             slot->frame_number = frame_num;
 
-            // Resize into pre-allocated slot buffer (zero-copy)
-            int model_input_size = cfg.inference->input_width() * cfg.inference->input_height() * 3;
-            preprocess::resize_into(frame,
-                                    cfg.inference->input_width(),
-                                    cfg.inference->input_height(),
-                                    slot->input_data, model_input_size);
+            // L3: resize() returns std::vector (temporary heap alloc), then memcpy into slot
+            // vs L4: resize_into() writes directly into slot->input_data (zero-copy)
+            auto resized = preprocess::resize(frame,
+                                              cfg.inference->input_width(),
+                                              cfg.inference->input_height());
+            int copy_input = std::min((int)resized.size(), kMaxModelInputSize);
+            memcpy(slot->input_data, resized.data(), copy_input);
 
             // Copy original frame data for thumbnail encoding later
-            int copy_size = std::min((int)frame.data.size(), kOrigDataSize);
-            memcpy(slot->orig_data, frame.data.data(), copy_size);
+            int copy_orig = std::min((int)frame.data.size(), kOrigDataSize);
+            memcpy(slot->orig_data, frame.data.data(), copy_orig);
 
             int64_t t_preproc_end = now_ns();
 
@@ -83,7 +89,7 @@ struct Pipeline::Impl {
         fprintf(stderr, "[recv] thread exiting (frames read: %d)\n", frame_num);
     }
 
-    // ── Thread 2: infer loop ──
+    // ── Thread 2: infer loop (identical to L4) ──
     void infer_loop() {
         fprintf(stderr, "[infer] thread started\n");
         auto& cfg = config;
@@ -135,7 +141,7 @@ struct Pipeline::Impl {
         fprintf(stderr, "[infer] thread exiting (frames processed: %d)\n", processed);
     }
 
-    // ── Thread 3: upload loop ──
+    // ── Thread 3: upload loop (identical to L4) ──
     void upload_loop() {
         fprintf(stderr, "[upload] thread started\n");
         auto& cfg = config;
@@ -222,12 +228,12 @@ int Pipeline::start(const PipelineConfig& config) {
     impl_->config = config;
 
     if (impl_->ring_a.init() != 0) {
-        fprintf(stderr, "Pipeline: ring_a init failed\n");
+        fprintf(stderr, "Pipeline L3: ring_a init failed\n");
         delete impl_; impl_ = nullptr;
         return -1;
     }
     if (impl_->ring_b.init() != 0) {
-        fprintf(stderr, "Pipeline: ring_b init failed\n");
+        fprintf(stderr, "Pipeline L3: ring_b init failed\n");
         impl_->ring_a.destroy();
         delete impl_; impl_ = nullptr;
         return -1;
@@ -235,14 +241,14 @@ int Pipeline::start(const PipelineConfig& config) {
 
     // Start consumers first, then producer
     if (pthread_create(&impl_->upload_tid, nullptr, Impl::upload_entry, impl_) != 0) {
-        fprintf(stderr, "Pipeline: pthread_create(upload) failed\n");
+        fprintf(stderr, "Pipeline L3: pthread_create(upload) failed\n");
         impl_->ring_a.destroy();
         impl_->ring_b.destroy();
         delete impl_; impl_ = nullptr;
         return -1;
     }
     if (pthread_create(&impl_->infer_tid, nullptr, Impl::infer_entry, impl_) != 0) {
-        fprintf(stderr, "Pipeline: pthread_create(infer) failed\n");
+        fprintf(stderr, "Pipeline L3: pthread_create(infer) failed\n");
         impl_->ring_b.shutdown();
         pthread_join(impl_->upload_tid, nullptr);
         impl_->ring_a.destroy();
@@ -251,7 +257,7 @@ int Pipeline::start(const PipelineConfig& config) {
         return -1;
     }
     if (pthread_create(&impl_->recv_tid, nullptr, Impl::recv_entry, impl_) != 0) {
-        fprintf(stderr, "Pipeline: pthread_create(recv) failed\n");
+        fprintf(stderr, "Pipeline L3: pthread_create(recv) failed\n");
         impl_->ring_a.shutdown();
         impl_->ring_b.shutdown();
         pthread_join(impl_->infer_tid, nullptr);
@@ -263,7 +269,7 @@ int Pipeline::start(const PipelineConfig& config) {
     }
     impl_->threads_started = true;
 
-    fprintf(stderr, "Pipeline: 3 threads started (recv → infer → upload)\n");
+    fprintf(stderr, "Pipeline L3: 3 pthreads started (RingBuffer + resize+memcpy)\n");
     return 0;
 }
 
@@ -273,7 +279,7 @@ void Pipeline::stop() {
         pthread_join(impl_->recv_tid, nullptr);
         pthread_join(impl_->infer_tid, nullptr);
         pthread_join(impl_->upload_tid, nullptr);
-        fprintf(stderr, "Pipeline: all threads joined\n");
+        fprintf(stderr, "Pipeline L3: all threads joined\n");
     }
     impl_->ring_a.destroy();
     impl_->ring_b.destroy();

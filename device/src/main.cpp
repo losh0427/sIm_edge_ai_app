@@ -35,6 +35,10 @@ int main(int argc, char** argv) {
     auto labels = load_labels(labels_path);
     fprintf(stderr, "Loaded %zu labels\n", labels.size());
 
+#ifdef PIPELINE_LEVEL
+    fprintf(stderr, "Pipeline level: %d\n", PIPELINE_LEVEL);
+#endif
+
     // Init HAL
     std::unique_ptr<IFrameSource> source;
 

@@ -19,6 +19,26 @@ else()
 endif()
 message(STATUS "HAL Camera Backend: ${HAL_CAMERA_BACKEND}")
 
+# === Pipeline Level ===
+set(PIPELINE_LEVEL "4" CACHE STRING "Pipeline optimization level: 0-4")
+set_property(CACHE PIPELINE_LEVEL PROPERTY STRINGS 0 1 2 3 4)
+
+if(PIPELINE_LEVEL STREQUAL "0")
+    set(PIPELINE_SOURCE src/pipeline_l0.cpp)
+elseif(PIPELINE_LEVEL STREQUAL "1")
+    set(PIPELINE_SOURCE src/pipeline_l1.cpp)
+elseif(PIPELINE_LEVEL STREQUAL "2")
+    set(PIPELINE_SOURCE src/pipeline_l2.cpp)
+elseif(PIPELINE_LEVEL STREQUAL "3")
+    set(PIPELINE_SOURCE src/pipeline_l3.cpp)
+elseif(PIPELINE_LEVEL STREQUAL "4")
+    set(PIPELINE_SOURCE src/pipeline.cpp)
+else()
+    message(FATAL_ERROR "Unknown PIPELINE_LEVEL: ${PIPELINE_LEVEL} (expected 0-4)")
+endif()
+add_compile_definitions(PIPELINE_LEVEL=${PIPELINE_LEVEL})
+message(STATUS "Pipeline Level: ${PIPELINE_LEVEL} (${PIPELINE_SOURCE})")
+
 # === TFLite (from source) ===
 set(TFLITE_SOURCE_DIR "/tf" CACHE PATH "TensorFlow source directory")
 if(NOT EXISTS "${TFLITE_SOURCE_DIR}/tensorflow/lite/CMakeLists.txt")
@@ -77,7 +97,7 @@ add_executable(edge_agent
     src/inference.cpp
     src/postprocess.cpp
     src/grpc_client.cpp
-    src/pipeline.cpp
+    ${PIPELINE_SOURCE}
     ${HAL_SOURCE}
     ${PROTO_GEN_DIR}/edge_ai.pb.cc
     ${PROTO_GEN_DIR}/edge_ai.grpc.pb.cc
