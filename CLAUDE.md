@@ -147,22 +147,60 @@ python -m grpc_tools.protoc -I proto --python_out=server --grpc_python_out=serve
 | `PIPELINE_LEVEL` | `4` | Compile-time pipeline level: 0 (single-thread) to 4 (full production) |
 
 ## Current Status
-- All source files written, not yet tested end-to-end
-- Server likely works first (simpler Python stack)
-- Device Docker build will be slow first time (TFLite source compile ~15min)
-- May need CMake/linking fixes for gRPC C++ on Ubuntu 22.04
+- Server + Device 已驗證 end-to-end（webcam → inference → gRPC → dashboard）
+- Two-machine deployment 完成（RUNBOOK.md）
+- Pipeline Level 0-4 benchmark 完成，有完整分析報告
 
-## Roadmap (in order)
+## Roadmap
+
+### Completed
 1. ✅ MVP code written (single-threaded, FileFrameSource, single machine Docker)
-2. Get server running and verified with test_grpc_client.py
-3. Get device Docker build passing (TFLite + gRPC linking)
-4. End-to-end: device → server → see detections in NiceGUI dashboard
+2. ✅ Server running + test_grpc_client.py verified
+3. ✅ Device Docker build passing (TFLite + gRPC linking)
+4. ✅ End-to-end: device → server → NiceGUI dashboard
 5. ✅ Multi-threaded pipeline (3 pthreads + RingBuffer with POSIX semaphores)
 6. ✅ Webcam support (OpenCVFrameSource + compile-time HAL switching)
-7. ✅ YOLOv8n TFLite support + runtime model auto-detect (A1)
-8. ✅ NMS parameters (CONF_THRESH / IOU_THRESH) fully runtime-configurable (A2)
-9. Two-machine deployment (device on laptop B, server on laptop A)
-10. Kernel module (ml_stats.ko), bpftrace, QEMU ARM64 (bonus items)
-11. ✅ NiceGUI dashboard migration (FastAPI + WebSocket, ECharts, dark mode, device status)
-12. Prometheus + Grafana (supplements NiceGUI dashboard via FastAPI endpoints)
-13. ✅ Pipeline Levels 0-3 (progressive optimization showcase, compile-time switch)
+7. ✅ YOLOv8n TFLite support + runtime model auto-detect
+8. ✅ NMS parameters (CONF_THRESH / IOU_THRESH) fully runtime-configurable
+9. ✅ Two-machine deployment (device on laptop B, server on laptop A, RUNBOOK.md)
+10. ✅ NiceGUI dashboard (FastAPI + WebSocket, ECharts, dark mode, device status)
+11. ✅ Pipeline Levels 0-4 (progressive optimization showcase, compile-time switch, benchmark analysis)
+
+### Next — Observability（~1-2 天）
+12. Prometheus + Grafana
+    - FastAPI `/metrics` endpoint (inference latency, FPS, detection count)
+    - Docker Compose 加 prometheus + grafana 容器
+    - Grafana dashboard 預設 JSON import
+    - 和 NiceGUI dashboard 互補：NiceGUI = 即時操作，Grafana = 歷史趨勢
+
+### Next — ML Optimization（~0.5 天）
+13. YOLOv8n INT8 量化
+    - 目前 inference ~78ms 是絕對瓶頸（佔 pipeline 81%）
+    - INT8 量化預期降到 30-40ms，直接提升 FPS 從 12.8 → ~25
+    - `models/export_yolov8n.py` 加 INT8 export path
+
+### Future — Systems（偏 Home/Nest/ChromeOS，高區分度）
+14. Kernel module (ml_stats.ko)
+    - /proc/ml_stats 暴露 inference latency histogram
+    - 展示 Linux kernel API、proc filesystem、module lifecycle
+15. bpftrace observability
+    - 不修改 user-space code，用 eBPF uprobe 追蹤 TFLite::Invoke latency
+    - 搭配 kernel module 展示「不同層級的 observability」
+16. QEMU ARM64 cross-compile
+    - aarch64 cross-build + QEMU user-mode 執行
+    - 展示嵌入式部署能力，模擬 Nest Hub / Coral 場景
+
+### Future — Infrastructure（偏 Cloud，中區分度）
+17. CI/CD (GitHub Actions)
+    - Docker build + test_grpc_client 自動跑
+    - 每個 PR 自動驗證 server 啟動 + gRPC 通訊
+18. k3s edge orchestration
+    - 輕量 K8s，DaemonSet 部署多 device pod
+    - liveness/readiness probe + auto-restart
+    - 和 Prometheus 天然整合
+    - 適合展示 cloud-native 能力，但和 Docker Compose 有功能重疊
+19. ShmFrameSource (shared memory HAL)
+    - IPC zero-copy shared memory frame source
+    - 展示 POSIX shm_open / mmap，符合 ChromeOS camera pipeline 架構
+20. Dashboard 多 device 支援
+    - Store 已支援多 edge_id，UI 加 device selector / 分頁顯示
