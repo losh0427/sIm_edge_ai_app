@@ -1,6 +1,6 @@
 # RUNBOOK — Two-Machine Deployment
 
-## 架構
+## Architecture
 
 ```
 Machine A (Server)  192.168.0.195
@@ -8,7 +8,7 @@ Machine A (Server)  192.168.0.195
        ├─ :50051  gRPC receiver
        └─ :8501   Streamlit UI
 
-Machine B (Device)  本機 (WSL2)
+Machine B (Device)  Local machine (WSL2)
   └─ Docker: sim_edge_ai_app-device
        ├─ /dev/video0  webcam via OpenCVFrameSource
        └─ → 192.168.0.195:50051  upstream gRPC
@@ -16,15 +16,15 @@ Machine B (Device)  本機 (WSL2)
 
 ---
 
-## 網路設定（Server 端 — Windows + WSL2）
+## Network Configuration (Server Side — Windows + WSL2)
 
-Docker container 跑在 WSL2 裡面，但外部裝置（Machine B）要透過 Windows 的 Wi-Fi IP 連進來。
-需要兩層設定：**Windows 防火牆** + **port proxy（Windows → WSL2 轉發）**。
+Docker containers run inside WSL2, but external devices (Machine B) connect through Windows' Wi-Fi IP.
+Two layers of configuration are needed: **Windows Firewall** + **port proxy (Windows → WSL2 forwarding)**.
 
-### 一次性設定：防火牆放行
+### One-Time Setup: Firewall Rules
 
 ```powershell
-# 管理員 PowerShell — 只需做一次，重開機後仍有效
+# Admin PowerShell — only needed once, persists across reboots
 New-NetFirewallRule -DisplayName "WSL2 gRPC 50051" `
   -Direction Inbound -Action Allow -Protocol TCP -LocalPort 50051
 
@@ -32,28 +32,28 @@ New-NetFirewallRule -DisplayName "WSL2 Streamlit 8501" `
   -Direction Inbound -Action Allow -Protocol TCP -LocalPort 8501
 ```
 
-驗證規則存在：
+Verify rules exist:
 ```powershell
 Get-NetFirewallRule -DisplayName "WSL2*" | Format-Table DisplayName, Enabled
 ```
 
-### 每次重開機要檢查：port proxy
+### Check After Each Reboot: Port Proxy
 
-Port proxy 規則本身是**永久的**（重開機不會消失），但 WSL2 的內部 IP **每次重啟可能會變**。
-如果 IP 變了，要刪掉舊規則重建。
+Port proxy rules themselves are **persistent** (survive reboots), but WSL2's internal IP **may change on each restart**.
+If the IP changes, delete the old rules and recreate them.
 
 ```powershell
-# 管理員 PowerShell
+# Admin PowerShell
 
-# 1. 查看目前規則
+# 1. View current rules
 netsh interface portproxy show v4tov4
 
-# 2. 進 WSL 查看目前 IP
+# 2. Check current WSL IP
 wsl -- hostname -I
-# 例如輸出: 172.21.49.121
+# Example output: 172.21.49.121
 
-# 3. 如果 IP 和規則一致 → 不用動
-#    如果 IP 變了 → 刪掉重建：
+# 3. If IP matches rules → no action needed
+#    If IP changed → delete and recreate:
 netsh interface portproxy delete v4tov4 listenport=50051 listenaddress=0.0.0.0
 netsh interface portproxy delete v4tov4 listenport=8501  listenaddress=0.0.0.0
 
@@ -61,60 +61,60 @@ netsh interface portproxy add v4tov4 listenport=50051 listenaddress=0.0.0.0 conn
 netsh interface portproxy add v4tov4 listenport=8501  listenaddress=0.0.0.0 connectport=8501  connectaddress=<WSL_IP>
 ```
 
-### 重開機快速 Checklist（Server 端）
+### Reboot Quick Checklist (Server Side)
 
 ```
-□  1. [WSL]        wsl -- hostname -I                     → 記下 WSL IP
-□  2. [PowerShell] netsh interface portproxy show v4tov4  → 比對 IP
-□  3. 如果 IP 不同 → 刪舊規則 + 加新規則（上方指令）
-□  4. 如果 IP 相同 → 不用動，直接啟動 server
+□  1. [WSL]        wsl -- hostname -I                     → Note WSL IP
+□  2. [PowerShell] netsh interface portproxy show v4tov4  → Compare IP
+□  3. If IP differs → delete old rules + add new rules (commands above)
+□  4. If IP matches → no action needed, start server directly
 ```
 
-> **為何不需要重建防火牆規則？** `New-NetFirewallRule` 寫入 Windows registry，永久有效。
-> **為何 port proxy 可能要改？** WSL2 用虛擬 NAT，每次啟動 IP 不固定。
+> **Why no need to recreate firewall rules?** `New-NetFirewallRule` writes to Windows registry, permanent.
+> **Why port proxy might need updating?** WSL2 uses virtual NAT, IP is not fixed across restarts.
 
 ---
 
-## 前置：下載模型（兩台都要，第一次才做）
+## Prerequisites: Download Model (both machines, first time only)
 
 ```bash
-# 從 repo 根目錄執行
+# Run from repo root
 bash models/download_model.sh
-# 預期輸出: Model downloaded: ~5.9M
+# Expected output: Model downloaded: ~5.9M
 ```
 
 ---
 
-## Machine A — 啟動 Server
+## Machine A — Start Server
 
 ```bash
-# 從 repo 根目錄
-docker compose up server --build     # 第一次，需 build（約 2 min）
-docker compose up server             # 之後（image 已存在）
+# From repo root
+docker compose up server --build     # First time, needs build (~2 min)
+docker compose up server             # Subsequent runs (image already exists)
 ```
 
-確認啟動：
-- gRPC : `nc -zv localhost 50051` → Connection succeeded
-- UI   : 瀏覽器開 http://192.168.0.195:8501
+Verify startup:
+- gRPC: `nc -zv localhost 50051` → Connection succeeded
+- UI: Open http://192.168.0.195:8501 in browser
 
-關閉：
+Shutdown:
 ```bash
 docker compose down
-# 或 Ctrl-C（若是前景執行）
+# Or Ctrl-C (if running in foreground)
 ```
 
 ---
 
-## Machine B — 啟動 Device（本機 WSL2）
+## Machine B — Start Device (Local WSL2)
 
-### 1. 確認攝影機可見
+### 1. Verify Camera is Visible
 
 ```bash
 ls /dev/video*
-# /dev/video0 存在才能繼續
+# /dev/video0 must exist before proceeding
 ```
 
-### 2. Build image（第一次，約 15 min，TFLite compile）
+### 2. Build Image (first time, ~15 min for TFLite compile)
 
 ```bash
 docker build \
@@ -124,10 +124,10 @@ docker build \
   .
 ```
 
-> 後續若只改了 models/ 或 data/，只有最後幾層失效，rebuild 幾秒完成。
-> 若改了 device/src/ 或 proto/，則從 compile 層開始重跑（~3 min）。
+> If only `models/` or `data/` changed, only the last few layers are invalidated — rebuild takes seconds.
+> If `device/src/` or `proto/` changed, rebuild starts from the compile layer (~3 min).
 
-### 3. 啟動
+### 3. Run
 
 ```bash
 docker run --rm \
@@ -139,7 +139,7 @@ docker run --rm \
   sim_edge_ai_app-device:latest
 ```
 
-正常啟動輸出：
+Expected startup output:
 ```
 Loaded 80 labels
 OpenCVFrameSource: opened /dev/video0 (640x480 MJPEG)
@@ -154,59 +154,59 @@ Pipeline: 3 threads started (recv → infer → upload)
 [upload] Frame 1 | 2.0 FPS | 157.9 ms | 0 detections
 ```
 
-關閉：`Ctrl-C`（容器 --rm 所以會自動刪除）
+Shutdown: `Ctrl-C` (container uses --rm so it is automatically removed)
 
 ---
 
-## 環境變數參考
+## Environment Variables Reference
 
-| 變數 | 預設 | 說明 |
+| Variable | Default | Description |
 |---|---|---|
-| `SERVER_ADDR` | `server:50051` | gRPC server 位址 |
-| `EDGE_ID` | `edge-1` | 裝置識別名稱 |
-| `CONF_THRESH` | `0.4` | 偵測信心門檻 |
-| `CAM_INDEX` | `0` | 攝影機編號 `/dev/videoN` |
-| `MODEL_PATH` | `/app/models/ssd_mobilenet_v2.tflite` | 模型路徑（容器內） |
-| `LABELS_PATH` | `/app/models/coco_labels.txt` | 標籤路徑（容器內） |
+| `SERVER_ADDR` | `server:50051` | gRPC server address |
+| `EDGE_ID` | `edge-1` | Device identifier name |
+| `CONF_THRESH` | `0.4` | Detection confidence threshold |
+| `CAM_INDEX` | `0` | Camera index `/dev/videoN` |
+| `MODEL_PATH` | `/app/models/ssd_mobilenet_v2.tflite` | Model path (inside container) |
+| `LABELS_PATH` | `/app/models/coco_labels.txt` | Labels path (inside container) |
 
 ---
 
-## 常見問題
+## Common Issues
 
 ### `mmap ... failed with error '22'`
-模型檔案不存在或為 0 bytes。
+Model file does not exist or is 0 bytes.
 ```bash
-ls -lh models/ssd_mobilenet_v2.tflite   # 確認 ~5.9M
-bash models/download_model.sh            # 重新下載
-docker build ...                         # 重建 image
+ls -lh models/ssd_mobilenet_v2.tflite   # Verify ~5.9M
+bash models/download_model.sh            # Re-download
+docker build ...                         # Rebuild image
 ```
 
-### `gRPC connected` 後馬上斷線
-Server 尚未啟動，或防火牆擋住 50051。
-Machine A 確認：`docker compose up server` 已在跑。
+### `gRPC connected` then immediate disconnect
+Server is not running, or firewall is blocking port 50051.
+On Machine A verify: `docker compose up server` is running.
 
 ### `/dev/video0: No such file or directory`
-WSL2 需要額外掛載 USB 攝影機（usbipd）。
-參考 `camera_research/WSL2_USB_CAMERA_GUIDE.md`。
+WSL2 requires additional USB camera mounting (usbipd).
+See `camera_research/WSL2_USB_CAMERA_GUIDE.md`.
 
-### build-arg 忘記加 `HAL_CAMERA_BACKEND=OPENCV`
-image 預設為 `FILE` 模式，會嘗試讀 `data/test_frames/` 而非攝影機。
-重新 build 時加上 `--build-arg HAL_CAMERA_BACKEND=OPENCV`。
+### Forgot to add `HAL_CAMERA_BACKEND=OPENCV` build-arg
+Image defaults to `FILE` mode, which tries to read `data/test_frames/` instead of the camera.
+Rebuild with `--build-arg HAL_CAMERA_BACKEND=OPENCV`.
 
 ---
 
-## 單機測試（不需要攝影機）
+## Single Machine Testing (no camera needed)
 
 ```bash
-# Terminal 1：啟動 server
+# Terminal 1: Start server
 docker compose up server
 
-# Terminal 2：用 Python fake client 推假資料
+# Terminal 2: Use Python fake client to push test data
 pip install grpcio grpcio-tools opencv-python numpy protobuf
 python test_grpc_client.py localhost:50051
 
-# Terminal 3：用 FILE 模式 device（讀測試圖）
+# Terminal 3: Use FILE mode device (reads test images)
 pip install opencv-python numpy
-python gen_test_frames.py              # 產生 data/test_frames/
+python gen_test_frames.py              # Generate data/test_frames/
 docker compose up device               # HAL_CAMERA_BACKEND=FILE
 ```
