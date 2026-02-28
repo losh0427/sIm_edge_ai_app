@@ -4,7 +4,7 @@
 
 - **Device**: WSL2 (webcam via OpenCVFrameSource)
 - **Model**: YOLOv8n float32 (640x640, TFLite + XNNPACK)
-- **Server**: 192.168.0.195:50051 (gRPC, same network)
+- **Server**: <SERVER_IP>:50051 (gRPC, same network)
 - **Warmup**: 10 frames
 - **Each level ran for ~60 seconds before stopping with Ctrl+C**
 
@@ -29,7 +29,7 @@
 | Level | Throughput FPS | Calculation Method |
 |---|---|---|
 | L0 | **10.9** | 1 / E2E_mean (serial, E2E = full pipeline time) |
-| L1 | **~12.8** | 1 / inference_mean (parallel, inference is bottleneck) |
+| L1 | **~12.8** | 1 / inference_mean |
 | L2 | **~12.8** | Same as above |
 | L3 | **~12.6** | Same as above |
 | L4 | **~12.8** | Same as above |

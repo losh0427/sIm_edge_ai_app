@@ -6,8 +6,8 @@
 |---|---|
 | OS | Windows 11 + WSL2 (Ubuntu) |
 | Custom Kernel | `5.15.146.1-microsoft-standard-WSL2+` |
-| Kernel bzImage Location | `C:\Users\427le\wsl-kernel\bzImage` |
-| .wslconfig | `C:\Users\427le\.wslconfig` |
+| Kernel bzImage Location | `C:\Users\<USERNAME>\wsl-kernel\bzImage` |
+| .wslconfig | `C:\Users\<USERNAME>\.wslconfig` |
 | usbipd-win Version | 5.3.0 |
 | Tested Camera | AVerMedia Live Streamer CAM 310P (VID:PID `07ca:310b`) |
 | Camera BUS-ID | `1-1` (may vary depending on USB port) |
@@ -73,14 +73,14 @@ make -j$(nproc)    # ~30-60 minutes
 ### 3. Configure .wslconfig to Point to Custom Kernel
 
 ```ini
-# C:\Users\427le\.wslconfig
+# C:\Users\<USERNAME>\.wslconfig
 [wsl2]
-kernel=C:\\Users\\427le\\wsl-kernel\\bzImage
+kernel=C:\\Users\\<USERNAME>\\wsl-kernel\\bzImage
 ```
 
 ```bash
 # Copy bzImage
-cp arch/x86/boot/bzImage /mnt/c/Users/427le/wsl-kernel/
+cp arch/x86/boot/bzImage /mnt/c/Users/<USERNAME>/wsl-kernel/
 ```
 
 ---
@@ -156,52 +156,6 @@ cap.release()
 # Admin PowerShell
 usbipd detach --busid <BUS-ID>
 ```
-
----
-
-## Quick Connection Checklist
-
-Follow these steps each time:
-
-```
-□  1. [Windows Admin PowerShell] usbipd list           → Find BUS-ID
-□  2. [Windows Admin PowerShell] usbipd bind --busid X
-□  3. [Windows Admin PowerShell] usbipd attach --wsl --busid X
-□  4. [WSL] lsusb                                       → Confirm camera appears
-□  5. [WSL] ls /dev/video*                              → Confirm video device appears
-□  6. [WSL] sudo chmod 666 /dev/video0 /dev/video1      → Set permissions
-□  7. [WSL] Run Python test script                       → Capture frame
-□  8. [Windows Admin PowerShell] usbipd detach --busid X → Return camera when done
-```
-
----
-
-## Known Issues and Solutions
-
-### select() timeout
-
-**Symptom**: Camera opens successfully but `cap.read()` keeps timing out.
-**Cause**: Default YUYV format has insufficient bandwidth over usbipd USB-over-IP.
-**Solution**: Force MJPEG format + lower resolution/FPS.
-
-```python
-cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG'))
-cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-cap.set(cv2.CAP_PROP_FPS, 15)
-```
-
-### Permission denied
-
-**Symptom**: `Cannot open video device /dev/video0: Permission denied`
-**Cause**: WSL has no udev rules to automatically set video group permissions.
-**Solution**: `sudo chmod 666 /dev/video0 /dev/video1`
-
-### Laptop Built-in Camera (BUS-ID 1-9)
-
-The laptop's built-in USB2.0 HD UVC WebCam can also be attached, but note:
-- Once attached to WSL, the Windows side cannot use it
-- BUS-ID is `1-9`, same procedure applies
 
 ---
 
