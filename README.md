@@ -3,6 +3,10 @@
 Real-time object detection on simulated IoT edge devices.
 A C++ edge agent captures frames, runs TFLite inference, and streams results over gRPC to a Python server with a live NiceGUI dashboard.
 
+## Demo
+
+https://github.com/user-attachments/assets/fc5039b3-14d7-4d51-b3e0-54522aab2edf
+
 ## Architecture
 
 ```
@@ -83,7 +87,6 @@ For YOLOv8n, two-machine deployment, webcam setup, and pipeline level switching,
 | [C++ Pipeline Deep Dive](docs/03_cpp_pipeline_deep_dive.md) | L0-L4 optimization evolution (core technical highlight) |
 | [Benchmark Results](docs/04_benchmark.md) | Python vs C++, L0-L4 comparison, stage breakdown analysis |
 | [Setup & Commands](docs/05_setup_and_commands.md) | Environment setup, build commands, troubleshooting |
-| [Code Walkthrough](docs/06_code_walkthrough.md) | File-by-file guide to the codebase |
 
 ## Environment Variables
 
