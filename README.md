@@ -45,7 +45,7 @@ A C++ edge agent captures frames, runs TFLite inference, and streams results ove
 | Server | Python 3.11, NiceGUI (FastAPI/uvicorn + WebSocket), gRPC, OpenCV |
 | Serialization | Protocol Buffers 3 |
 | Infrastructure | Docker Compose, multi-stage builds |
-| Models | SSD MobileNet v2 (INT8) / YOLOv8n (float32), runtime auto-detect |
+| Models | SSD MobileNet v2 (INT8) / YOLOv8n (float32) |
 
 ## Quick Start
 
