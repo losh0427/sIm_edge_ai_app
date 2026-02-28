@@ -1,4 +1,4 @@
-# Edge AI Runtime
+# Real-Time Multi-Device Object Detection Application 
 
 Real-time object detection on simulated IoT edge devices.
 A C++ edge agent captures frames, runs TFLite inference, and streams results over gRPC to a Python server with a live NiceGUI dashboard.
