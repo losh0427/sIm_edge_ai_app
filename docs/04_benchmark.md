@@ -7,7 +7,7 @@
 | Platform | WSL2 on Windows (Intel CPU) |
 | Model (Pipeline Levels) | YOLOv8n float32, 640x640, TFLite + XNNPACK |
 | Model (Python vs C++) | SSD MobileNet v2 INT8, 300x300 |
-| Server | gRPC on same network (192.168.0.195:50051) |
+| Server | gRPC on same network (<SERVER_IP>:50051) |
 | Frame source (Pipeline Levels) | Webcam via OpenCVFrameSource |
 | Frame source (Python vs C++) | JPEG files via FileFrameSource |
 | Warmup | 10-50 frames (excluded from metrics) |

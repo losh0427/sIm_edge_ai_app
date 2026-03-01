@@ -4,7 +4,7 @@
 
 - **Device**: WSL2 (webcam via OpenCVFrameSource)
 - **Model**: YOLOv8n float32 (640x640, TFLite + XNNPACK)
-- **Server**: 192.168.0.195:50051 (gRPC, same network)
+- **Server**: <SERVER_IP>:50051 (gRPC, same network)
 - **Warmup**: 10 frames
 - **Each level ran for ~60 seconds before stopping with Ctrl+C**
 

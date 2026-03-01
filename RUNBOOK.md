@@ -3,7 +3,7 @@
 ## Architecture
 
 ```
-Machine A (Server)  192.168.0.195
+Machine A (Server)  <SERVER_IP>
   └─ Docker: sim_edge_ai_app-server
        ├─ :50051  gRPC receiver
        └─ :8501   Streamlit UI
@@ -11,7 +11,7 @@ Machine A (Server)  192.168.0.195
 Machine B (Device)  Local machine (WSL2)
   └─ Docker: sim_edge_ai_app-device
        ├─ /dev/video0  webcam via OpenCVFrameSource
-       └─ → 192.168.0.195:50051  upstream gRPC
+       └─ → <SERVER_IP>:50051  upstream gRPC
 ```
 
 ---
@@ -95,7 +95,7 @@ docker compose up server             # Subsequent runs (image already exists)
 
 Verify startup:
 - gRPC: `nc -zv localhost 50051` → Connection succeeded
-- UI: Open http://192.168.0.195:8501 in browser
+- UI: Open http://<SERVER_IP>:8501 in browser
 
 Shutdown:
 ```bash
@@ -131,7 +131,7 @@ docker build \
 
 ```bash
 docker run --rm \
-  -e SERVER_ADDR=192.168.0.195:50051 \
+  -e SERVER_ADDR=<SERVER_IP>:50051 \
   -e EDGE_ID=edge-2 \
   -e CONF_THRESH=0.4 \
   -e CAM_INDEX=0 \
@@ -146,7 +146,7 @@ OpenCVFrameSource: opened /dev/video0 (640x480 MJPEG)
 Frame source: OPENCV:cam0:640x480
 INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
 Model loaded: input 300x300
-gRPC connected to 192.168.0.195:50051
+gRPC connected to <SERVER_IP>:50051
 [upload] thread started
 [infer] thread started
 Pipeline: 3 threads started (recv → infer → upload)

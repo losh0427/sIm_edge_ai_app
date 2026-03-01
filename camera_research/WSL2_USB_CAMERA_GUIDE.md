@@ -6,8 +6,8 @@
 |---|---|
 | OS | Windows 11 + WSL2 (Ubuntu) |
 | Custom Kernel | `5.15.146.1-microsoft-standard-WSL2+` |
-| Kernel bzImage Location | `C:\Users\427le\wsl-kernel\bzImage` |
-| .wslconfig | `C:\Users\427le\.wslconfig` |
+| Kernel bzImage Location | `C:\Users\<USERNAME>\wsl-kernel\bzImage` |
+| .wslconfig | `C:\Users\<USERNAME>\.wslconfig` |
 | usbipd-win Version | 5.3.0 |
 | Tested Camera | AVerMedia Live Streamer CAM 310P (VID:PID `07ca:310b`) |
 | Camera BUS-ID | `1-1` (may vary depending on USB port) |
@@ -73,14 +73,14 @@ make -j$(nproc)    # ~30-60 minutes
 ### 3. Configure .wslconfig to Point to Custom Kernel
 
 ```ini
-# C:\Users\427le\.wslconfig
+# C:\Users\<USERNAME>\.wslconfig
 [wsl2]
-kernel=C:\\Users\\427le\\wsl-kernel\\bzImage
+kernel=C:\\Users\\<USERNAME>\\wsl-kernel\\bzImage
 ```
 
 ```bash
 # Copy bzImage
-cp arch/x86/boot/bzImage /mnt/c/Users/427le/wsl-kernel/
+cp arch/x86/boot/bzImage /mnt/c/Users/<USERNAME>/wsl-kernel/
 ```
 
 ---
